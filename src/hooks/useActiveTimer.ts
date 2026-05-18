@@ -1,0 +1,119 @@
+import { useCallback, useMemo } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { KimaiClient } from "../api/kimaiClient";
+import { KimaiApiError } from "../api/kimaiClient";
+import { getActiveTimesheets, stopTimesheet } from "../api/timesheetApi";
+import { getProjects } from "../api/projectApi";
+import { getActivities } from "../api/activityApi";
+import type { ActiveTimer } from "../types";
+
+export type ConnectionStatus =
+  | "connected"
+  | "loading"
+  | "error"
+  | "offline"
+  | "unconfigured";
+
+interface UseActiveTimerResult {
+  timer: ActiveTimer | null;
+  multipleActive: boolean;
+  status: ConnectionStatus;
+  errorMessage: string;
+  isStopping: boolean;
+  stopTimer: () => void;
+}
+
+export function useActiveTimer(
+  client: KimaiClient | null,
+  isConfigured: boolean,
+  refreshIntervalSec: number,
+): UseActiveTimerResult {
+  const qc = useQueryClient();
+  const enabled = !!client;
+
+  const activeQ = useQuery({
+    queryKey: ["active-timesheets", client?.baseUrl],
+    queryFn: () => getActiveTimesheets(client!),
+    enabled,
+    refetchInterval: refreshIntervalSec * 1000,
+  });
+
+  const projectsQ = useQuery({
+    queryKey: ["projects", client?.baseUrl],
+    queryFn: () => getProjects(client!),
+    enabled,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const activitiesQ = useQuery({
+    queryKey: ["activities", client?.baseUrl],
+    queryFn: () => getActivities(client!),
+    enabled,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const entries = activeQ.data ?? [];
+  const projects = projectsQ.data ?? [];
+  const activities = activitiesQ.data ?? [];
+
+  const timer = useMemo<ActiveTimer | null>(() => {
+    if (entries.length === 0) return null;
+    const entry = entries.reduce((a, b) => (a.begin > b.begin ? a : b));
+    const proj = projects.find((p) => p.id === entry.project);
+    const act = activities.find((a) => a.id === entry.activity);
+    return {
+      id: entry.id,
+      project: proj?.name ?? `Project #${entry.project}`,
+      projectColor: proj?.color ?? "#6b7280",
+      activity: act?.name ?? `Activity #${entry.activity}`,
+      description: entry.description ?? "",
+      beginSeconds: Math.floor(new Date(entry.begin).getTime() / 1000),
+    };
+  }, [entries, projects, activities]);
+
+  const stopMut = useMutation({
+    mutationFn: (id: number) => stopTimesheet(client!, id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["active-timesheets"] });
+    },
+  });
+
+  const stopTimer = useCallback(() => {
+    if (timer) stopMut.mutate(timer.id);
+  }, [timer, stopMut]);
+
+  // Derive connection status
+  let status: ConnectionStatus = "connected";
+  let errorMessage = "";
+
+  if (!isConfigured) {
+    status = "unconfigured";
+  } else if (activeQ.isLoading) {
+    status = "loading";
+  } else if (activeQ.error) {
+    const err = activeQ.error;
+    if (err instanceof KimaiApiError) {
+      status = err.code === "network_error" ? "offline" : "error";
+      errorMessage = err.message;
+    } else {
+      status = "error";
+      errorMessage = String(err);
+    }
+  }
+
+  if (stopMut.error) {
+    errorMessage =
+      stopMut.error instanceof KimaiApiError
+        ? stopMut.error.message
+        : "Failed to stop timer";
+  }
+
+  return {
+    timer,
+    multipleActive: entries.length > 1,
+    status,
+    errorMessage,
+    isStopping: stopMut.isPending,
+    stopTimer,
+  };
+}

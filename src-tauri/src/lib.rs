@@ -9,6 +9,7 @@ pub fn run() {
             keychain::save_api_token,
             keychain::get_api_token,
             keychain::delete_api_token,
+            tray::set_tray_tooltip,
         ])
         .setup(|app| {
             tray::create_tray(app.handle())?;

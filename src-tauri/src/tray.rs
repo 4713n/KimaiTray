@@ -6,6 +6,12 @@ use tauri::{
     AppHandle, Manager, PhysicalPosition, WebviewWindow,
 };
 
+#[tauri::command]
+pub fn set_tray_tooltip(app: AppHandle, text: String) -> Result<(), String> {
+    let tray = app.tray_by_id("main").ok_or("Tray icon not found")?;
+    tray.set_tooltip(Some(&text)).map_err(|e| e.to_string())
+}
+
 static LAST_POPUP_HIDE: AtomicU64 = AtomicU64::new(0);
 
 fn now_ms() -> u64 {
@@ -52,7 +58,7 @@ pub fn create_tray(app: &AppHandle) -> tauri::Result<()> {
         .item(&quit_i)
         .build()?;
 
-    TrayIconBuilder::new()
+    TrayIconBuilder::with_id("main")
         .icon(app.default_window_icon().cloned().unwrap())
         .tooltip("KimaiMate")
         .menu(&menu)

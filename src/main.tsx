@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import QueryProvider from "./providers/QueryProvider";
 import TrayPopup from "./windows/TrayPopup";
 import Settings from "./windows/Settings";
 import "./index.css";
@@ -13,7 +14,11 @@ function App() {
       return <Settings />;
     case "tray-popup":
     default:
-      return <TrayPopup />;
+      return (
+        <QueryProvider>
+          <TrayPopup />
+        </QueryProvider>
+      );
   }
 }
 

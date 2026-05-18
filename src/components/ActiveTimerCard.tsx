@@ -4,6 +4,8 @@ import type { ActiveTimer } from "../types";
 interface ActiveTimerCardProps {
   timer: ActiveTimer;
   onStop: () => void;
+  isStopping?: boolean;
+  multipleActive?: boolean;
 }
 
 function formatElapsed(seconds: number): string {
@@ -14,15 +16,23 @@ function formatElapsed(seconds: number): string {
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
-export default function ActiveTimerCard({ timer, onStop }: ActiveTimerCardProps) {
+export default function ActiveTimerCard({
+  timer,
+  onStop,
+  isStopping,
+  multipleActive,
+}: ActiveTimerCardProps) {
   const [elapsed, setElapsed] = useState(() =>
-    Math.floor(Date.now() / 1000) - timer.beginSeconds
+    Math.max(0, Math.floor(Date.now() / 1000) - timer.beginSeconds),
   );
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setElapsed(Math.floor(Date.now() / 1000) - timer.beginSeconds);
-    }, 1000);
+    const tick = () =>
+      setElapsed(
+        Math.max(0, Math.floor(Date.now() / 1000) - timer.beginSeconds),
+      );
+    tick();
+    const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [timer.beginSeconds]);
 
@@ -40,6 +50,11 @@ export default function ActiveTimerCard({ timer, onStop }: ActiveTimerCardProps)
           <span className="text-[10px] text-gray-400 dark:text-gray-500">
             {timer.activity}
           </span>
+          {multipleActive && (
+            <span className="ml-auto shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+              +more
+            </span>
+          )}
         </div>
 
         {timer.description && (
@@ -54,15 +69,19 @@ export default function ActiveTimerCard({ timer, onStop }: ActiveTimerCardProps)
           </span>
           <button
             onClick={onStop}
+            disabled={isStopping}
             className="px-2.5 py-1 text-[11px] font-medium rounded-md
               bg-red-500/10 text-red-600 dark:text-red-400
               hover:bg-red-500/20 active:bg-red-500/30
+              disabled:opacity-50 disabled:cursor-not-allowed
               transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-red-400"
           >
-            Stop
+            {isStopping ? "Stopping…" : "Stop"}
           </button>
         </div>
       </div>
     </div>
   );
 }
+
+export { formatElapsed };
