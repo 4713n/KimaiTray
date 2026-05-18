@@ -38,6 +38,7 @@ export interface AppSettings {
   showIdleNotification: boolean;
 
   useCompactPopup: boolean;
+  roundedPopupCorners: boolean;
   reduceVisualEffects: boolean;
   accentStyle: "blue" | "green" | "purple" | "orange" | "red";
 }

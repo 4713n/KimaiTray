@@ -101,6 +101,46 @@ fn position_popup(window: &WebviewWindow, tray_rect: &tauri::Rect) -> tauri::Res
     Ok(())
 }
 
+#[tauri::command]
+pub fn set_popup_corner_radius(app: AppHandle, radius: f64) -> Result<(), String> {
+    let window = app
+        .get_webview_window("tray-popup")
+        .ok_or("Popup not found")?;
+
+    #[cfg(target_os = "macos")]
+    {
+        use objc::runtime::Object;
+        use objc::{class, msg_send, sel, sel_impl};
+
+        window
+            .with_webview(move |wv| unsafe {
+                let wk: *mut Object = wv.inner() as *mut Object;
+                let ns_win: *mut Object = msg_send![wk, window];
+                if ns_win.is_null() {
+                    return;
+                }
+
+                let clear: *mut Object = msg_send![class!(NSColor), clearColor];
+                let _: () = msg_send![ns_win, setBackgroundColor: clear];
+                let _: () = msg_send![ns_win, setOpaque: false];
+
+                let cv: *mut Object = msg_send![ns_win, contentView];
+                let _: () = msg_send![cv, setWantsLayer: true];
+                let layer: *mut Object = msg_send![cv, layer];
+                let _: () = msg_send![layer, setCornerRadius: radius];
+                let _: () = msg_send![layer, setMasksToBounds: true];
+            })
+            .map_err(|e| format!("{e}"))?;
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = (window, radius);
+    }
+
+    Ok(())
+}
+
 pub fn create_tray(app: &AppHandle) -> tauri::Result<()> {
     let settings_i = MenuItem::with_id(app, "settings", "Settings", true, None::<&str>)?;
     let open_kimai_i = MenuItem::with_id(app, "open_kimai", "Open Kimai", true, None::<&str>)?;

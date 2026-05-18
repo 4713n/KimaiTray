@@ -22,6 +22,7 @@ export const defaultSettings: AppSettings = {
   showIdleNotification: true,
 
   useCompactPopup: false,
+  roundedPopupCorners: true,
   reduceVisualEffects: false,
   accentStyle: "blue",
 };

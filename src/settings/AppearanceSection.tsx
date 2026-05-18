@@ -28,6 +28,15 @@ export default function AppearanceSection({ settings, update }: Props) {
         Customize the look and feel of KimaiTray.
       </SectionDescription>
 
+      <FieldGroup label="Rounded corners" description="Round the popup edges like native macOS tray apps" horizontal>
+        <Toggle
+          checked={settings.roundedPopupCorners}
+          onChange={(v) => update("roundedPopupCorners", v)}
+        />
+      </FieldGroup>
+
+      <Divider />
+
       <FieldGroup label="Compact popup" description="Use a smaller, denser layout for the tray popup" horizontal>
         <Toggle
           checked={settings.useCompactPopup}
