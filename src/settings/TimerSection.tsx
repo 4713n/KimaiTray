@@ -108,7 +108,7 @@ export default function TimerSection({ settings, update }: Props) {
             onClick={() => update("showSecondsInTimer", !settings.showSecondsInTimer)}
             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
               focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-1
-              ${settings.showSecondsInTimer ? "bg-blue-500" : "bg-gray-200 dark:bg-gray-700"}`}
+              ${settings.showSecondsInTimer ? "bg-[var(--accent)]" : "bg-gray-200 dark:bg-gray-700"}`}
           >
             <span
               className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform

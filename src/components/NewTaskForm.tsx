@@ -14,7 +14,7 @@ interface NewTaskFormProps {
 }
 
 const selectCls =
-  "w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1.5 text-xs text-gray-700 dark:text-gray-300 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 focus:outline-none disabled:opacity-50";
+  "w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1.5 text-xs text-gray-700 dark:text-gray-300 focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] focus:outline-none disabled:opacity-50";
 
 export default function NewTaskForm({
   client,
@@ -213,7 +213,7 @@ export default function NewTaskForm({
             <button
               type="button"
               onClick={() => setUseCustomTime(!useCustomTime)}
-              className="text-[9px] text-blue-500 dark:text-blue-400 hover:underline"
+              className="text-[9px] text-[var(--accent)] hover:underline"
             >
               {useCustomTime ? "Use now" : "Custom"}
             </button>

@@ -86,7 +86,7 @@ export default function IdleDialog({
           <button
             onClick={onContinue}
             disabled={isProcessing}
-            className={`${btnBase} bg-blue-600 text-white hover:bg-blue-700`}
+            className={`${btnBase} bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]`}
           >
             Continue — keep idle time
           </button>

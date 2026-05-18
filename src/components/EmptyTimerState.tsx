@@ -9,7 +9,7 @@ export default function EmptyTimerState({
     return (
       <div className="mx-3 mt-2 rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-4">
         <div className="flex flex-col items-center gap-1.5">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-200 border-t-blue-500 dark:border-gray-600 dark:border-t-blue-400" />
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-200 dark:border-gray-600" style={{ borderTopColor: "var(--accent)" }} />
           <span className="text-xs text-gray-400 dark:text-gray-500">
             Loading…
           </span>

@@ -18,7 +18,7 @@ export default function PopupFooterActions({
     <footer className="flex items-center gap-1 border-t border-gray-100 dark:border-gray-800 px-2 py-1.5">
       <button
         onClick={onNewTask}
-        className={`${btnBase} text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30`}
+        className={`${btnBase} text-[var(--accent)] hover:bg-[var(--accent-light)]`}
       >
         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />

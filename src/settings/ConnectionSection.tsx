@@ -130,10 +130,10 @@ export default function ConnectionSection({
           type="button"
           onClick={handleTest}
           disabled={status === "testing" || !settings.kimaiUrl || !token}
-          className="rounded-md bg-blue-600 px-3.5 py-1.5 text-[12px] font-medium text-white
-            hover:bg-blue-700 active:bg-blue-800
+          className="rounded-md bg-[var(--accent)] px-3.5 py-1.5 text-[12px] font-medium text-white
+            hover:bg-[var(--accent-hover)] active:opacity-80
             disabled:opacity-50 disabled:cursor-not-allowed
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-1
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-1
             transition-colors"
         >
           {status === "testing" ? "Testing…" : "Test Connection"}

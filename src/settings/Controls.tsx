@@ -87,7 +87,7 @@ export function Toggle({ checked, onChange, disabled }: ToggleProps) {
       onClick={() => onChange(!checked)}
       className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
         focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-1
-        ${checked ? "bg-blue-500" : "bg-gray-200 dark:bg-gray-700"}
+        ${checked ? "bg-[var(--accent)]" : "bg-gray-200 dark:bg-gray-700"}
         ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
     >
       <span

@@ -1,6 +1,7 @@
 import { type ReactNode, useState } from "react";
 import type { SettingsSection } from "../types";
 import { useSettings } from "../settings/useSettings";
+import { useAppearance } from "../hooks/useAppearance";
 import ConnectionSection from "../settings/ConnectionSection";
 import GeneralSection from "../settings/GeneralSection";
 import TimerSection from "../settings/TimerSection";
@@ -68,6 +69,7 @@ const NAV_ITEMS: { id: SettingsSection; label: string; icon: ReactNode }[] = [
 export default function Settings() {
   const [section, setSection] = useState<SettingsSection>("connection");
   const { settings, token, update, updateToken, loaded } = useSettings();
+  useAppearance();
 
   if (!loaded) {
     return (
@@ -97,14 +99,14 @@ export default function Settings() {
                 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-400
                 ${
                   section === item.id
-                    ? "bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 font-medium"
+                    ? "bg-[var(--accent-light)] text-[var(--accent)] font-medium"
                     : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
                 }`}
             >
               <span
                 className={
                   section === item.id
-                    ? "text-blue-500 dark:text-blue-400"
+                    ? "text-[var(--accent)]"
                     : "text-gray-400 dark:text-gray-500"
                 }
               >
