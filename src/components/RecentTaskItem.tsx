@@ -1,4 +1,5 @@
 import type { RecentTask } from "../types";
+import TagsList from "./TagsList";
 
 interface RecentTaskItemProps {
   task: RecentTask;
@@ -46,6 +47,11 @@ export default function RecentTaskItem({
           <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">
             {subtitle}
           </p>
+        )}
+        {task.tags.length > 0 && (
+          <div className="mt-0.5">
+            <TagsList tags={task.tags} maxVisible={2} />
+          </div>
         )}
       </div>
 

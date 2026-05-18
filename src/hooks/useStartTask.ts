@@ -3,11 +3,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { KimaiClient } from "../api/kimaiClient";
 import { KimaiApiError } from "../api/kimaiClient";
 import { startTimesheet, stopTimesheet } from "../api/timesheetApi";
+import { serializeKimaiTags } from "../api/tagUtils";
 
 export interface StartTaskPayload {
   projectId: number;
   activityId: number;
   description?: string;
+  tags?: string[];
   begin?: string;
   label: string;
 }
@@ -43,6 +45,9 @@ export function useStartTask(
           project: payload.projectId,
           activity: payload.activityId,
           description: payload.description,
+          tags: payload.tags?.length
+            ? serializeKimaiTags(payload.tags)
+            : undefined,
           begin: payload.begin ?? new Date().toISOString(),
         });
       } catch (err) {

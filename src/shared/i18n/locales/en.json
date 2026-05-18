@@ -180,6 +180,11 @@
   "notifications": {
     "idleWhileTracking": "You were idle for {{minutes}} min while tracking \"{{project}}\""
   },
+  "tags": {
+    "label": "Tags",
+    "placeholder": "Add tag…",
+    "addTags": "Add tags…"
+  },
   "errors": {
     "unknown": "Unknown error",
     "network": "Network error",

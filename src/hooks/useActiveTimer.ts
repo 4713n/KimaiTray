@@ -8,6 +8,7 @@ import { getProjects } from "../api/projectApi";
 import { getActivities } from "../api/activityApi";
 import type { ActiveTimer } from "../types";
 import { extractId } from "../api/kimaiTypes";
+import { normalizeKimaiTags } from "../api/tagUtils";
 
 export type ConnectionStatus =
   | "connected"
@@ -74,6 +75,7 @@ export function useActiveTimer(
       projectColor: proj?.color ?? "#6b7280",
       activity: act?.name ?? `Activity #${activityId}`,
       description: entry.description ?? "",
+      tags: normalizeKimaiTags(entry.tags),
       beginSeconds: Math.floor(new Date(entry.begin).getTime() / 1000),
       beginIso: entry.begin,
     };

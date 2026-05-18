@@ -6,6 +6,7 @@ export interface ActiveTimer {
   projectColor: string;
   activity: string;
   description: string;
+  tags: string[];
   beginSeconds: number;
   beginIso: string;
 }
@@ -19,6 +20,7 @@ export interface RecentTask {
   customer: string;
   activity: string;
   description: string;
+  tags: string[];
   lastUsed: string;
 }
 

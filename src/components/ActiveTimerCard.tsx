@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { ActiveTimer } from "../types";
+import TagsList from "./TagsList";
+import TagsInput from "./TagsInput";
 
 interface ActiveTimerCardProps {
   timer: ActiveTimer;
@@ -9,7 +11,7 @@ interface ActiveTimerCardProps {
   multipleActive?: boolean;
   onEdit?: (
     id: number,
-    payload: { description?: string; begin?: string },
+    payload: { description?: string; begin?: string; tags?: string[] },
   ) => void;
   isSaving?: boolean;
   saveError?: string | null;
@@ -93,6 +95,29 @@ export default function ActiveTimerCard({
     }
   };
 
+  // ── Tag editing ──
+  const [editingTags, setEditingTags] = useState(false);
+  const [tagsValue, setTagsValue] = useState<string[]>([]);
+
+  const startEditTags = () => {
+    if (!onEdit) return;
+    setTagsValue([...timer.tags]);
+    setEditingTags(true);
+  };
+
+  const saveTags = (newTags: string[]) => {
+    setTagsValue(newTags);
+  };
+
+  const commitTags = () => {
+    setEditingTags(false);
+    const before = timer.tags.map((t) => t.toLowerCase()).sort().join(",");
+    const after = tagsValue.map((t) => t.toLowerCase()).sort().join(",");
+    if (before !== after) {
+      onEdit?.(timer.id, { tags: tagsValue });
+    }
+  };
+
   // ── Begin time editing ──
   const [editingBegin, setEditingBegin] = useState(false);
   const [beginValue, setBeginValue] = useState("");
@@ -142,6 +167,7 @@ export default function ActiveTimerCard({
   // Reset editing when timer changes
   useEffect(() => {
     setEditingDesc(false);
+    setEditingTags(false);
     setEditingBegin(false);
     setBeginError("");
   }, [timer.id]);
@@ -208,7 +234,34 @@ export default function ActiveTimerCard({
           )}
         </div>
 
-        {/* Row 3: Elapsed + start time + stop */}
+        {/* Row 3: Tags */}
+        <div className="pl-4 mb-1.5">
+          {editingTags ? (
+            <div onBlur={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                commitTags();
+              }
+            }}>
+              <TagsInput tags={tagsValue} onChange={saveTags} />
+            </div>
+          ) : timer.tags.length > 0 ? (
+            <div
+              onClick={startEditTags}
+              className={onEdit ? "cursor-pointer hover:bg-emerald-100/50 dark:hover:bg-emerald-900/30 rounded px-1 -mx-1 py-0.5 transition-colors" : ""}
+            >
+              <TagsList tags={timer.tags} maxVisible={3} />
+            </div>
+          ) : onEdit ? (
+            <p
+              onClick={startEditTags}
+              className="text-[10px] text-gray-300 dark:text-gray-600 italic cursor-text hover:bg-emerald-100/50 dark:hover:bg-emerald-900/30 rounded px-1 -mx-1 transition-colors"
+            >
+              {t("tags.addTags")}
+            </p>
+          ) : null}
+        </div>
+
+        {/* Row 4: Elapsed + start time + stop */}
         <div className="flex items-center justify-between pl-4">
           <div className="flex items-baseline gap-2 min-w-0">
             <span className="text-lg font-mono font-semibold tabular-nums text-emerald-700 dark:text-emerald-400 tracking-tight shrink-0">

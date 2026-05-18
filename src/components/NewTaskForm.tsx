@@ -5,6 +5,7 @@ import type { KimaiClient } from "../api/kimaiClient";
 import { getCustomers, getProjects } from "../api/projectApi";
 import { getActivities } from "../api/activityApi";
 import type { StartTaskPayload } from "../hooks/useStartTask";
+import TagsInput from "./TagsInput";
 
 interface NewTaskFormProps {
   client: KimaiClient;
@@ -29,6 +30,7 @@ export default function NewTaskForm({
   const [projectId, setProjectId] = useState<number | null>(null);
   const [activityId, setActivityId] = useState<number | null>(null);
   const [description, setDescription] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [useCustomTime, setUseCustomTime] = useState(false);
   const [beginTime, setBeginTime] = useState("");
 
@@ -89,6 +91,7 @@ export default function NewTaskForm({
       projectId: projectId!,
       activityId: activityId!,
       description: description.trim() || undefined,
+      tags: tags.length > 0 ? tags : undefined,
       begin:
         useCustomTime && beginTime
           ? new Date(beginTime).toISOString()
@@ -205,6 +208,13 @@ export default function NewTaskForm({
             placeholder={t("newTask.optionalNote")}
             className={selectCls}
           />
+        </div>
+
+        <div>
+          <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+            {t("tags.label")}
+          </label>
+          <TagsInput tags={tags} onChange={setTags} disabled={isSubmitting} />
         </div>
 
         <div>

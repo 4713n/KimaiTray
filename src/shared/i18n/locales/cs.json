@@ -180,6 +180,11 @@
   "notifications": {
     "idleWhileTracking": "Byli jste neaktivní {{minutes}} min při sledování \"{{project}}\""
   },
+  "tags": {
+    "label": "Štítky",
+    "placeholder": "Přidat štítek…",
+    "addTags": "Přidat štítky…"
+  },
   "errors": {
     "unknown": "Neznámá chyba",
     "network": "Chyba sítě",

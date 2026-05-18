@@ -8,6 +8,7 @@ export const mockActiveTimer: ActiveTimer = {
   projectColor: "#10b981",
   activity: "Development",
   description: "Implementing dashboard layout",
+  tags: ["frontend", "urgent"],
   beginSeconds: Math.floor(Date.now() / 1000) - 2 * 3600 - 15 * 60,
   beginIso: new Date(Date.now() - (2 * 3600 + 15 * 60) * 1000).toISOString(),
 };
@@ -22,6 +23,7 @@ export const mockRecentTasks: RecentTask[] = [
     customer: "Acme Corp",
     activity: "Development",
     description: "API integration",
+    tags: ["backend"],
     lastUsed: "Today",
   },
   {
@@ -33,6 +35,7 @@ export const mockRecentTasks: RecentTask[] = [
     customer: "Acme Corp",
     activity: "Design",
     description: "User flow wireframes",
+    tags: [],
     lastUsed: "Today",
   },
   {
@@ -44,6 +47,7 @@ export const mockRecentTasks: RecentTask[] = [
     customer: "Beta Inc",
     activity: "Meeting",
     description: "Sprint planning",
+    tags: ["meeting", "sprint"],
     lastUsed: "Yesterday",
   },
   {
@@ -55,6 +59,7 @@ export const mockRecentTasks: RecentTask[] = [
     customer: "Acme Corp",
     activity: "Testing",
     description: "Cross-browser testing",
+    tags: [],
     lastUsed: "Yesterday",
   },
   {
@@ -66,6 +71,7 @@ export const mockRecentTasks: RecentTask[] = [
     customer: "",
     activity: "Development",
     description: "CI/CD pipeline setup",
+    tags: ["devops"],
     lastUsed: "May 16",
   },
   {
@@ -77,6 +83,7 @@ export const mockRecentTasks: RecentTask[] = [
     customer: "Acme Corp",
     activity: "Development",
     description: "Push notifications",
+    tags: [],
     lastUsed: "May 15",
   },
 ];

@@ -6,6 +6,7 @@ import { getProjects, getCustomers } from "../api/projectApi";
 import { getActivities } from "../api/activityApi";
 import type { RecentTask } from "../types";
 import { extractId } from "../api/kimaiTypes";
+import { normalizeKimaiTags } from "../api/tagUtils";
 
 function formatRelativeDate(iso: string): string {
   const d = new Date(iso);
@@ -90,6 +91,7 @@ export function useRecentTasks(
         customer: cust?.name ?? "",
         activity: act?.name ?? `Activity #${activityId}`,
         description: entry.description ?? "",
+        tags: normalizeKimaiTags(entry.tags),
         lastUsed: formatRelativeDate(entry.begin),
       });
 

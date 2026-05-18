@@ -180,6 +180,11 @@
   "notifications": {
     "idleWhileTracking": "Sie waren {{minutes}} Min. inaktiv während \"{{project}}\" erfasst wurde"
   },
+  "tags": {
+    "label": "Tags",
+    "placeholder": "Tag hinzufügen…",
+    "addTags": "Tags hinzufügen…"
+  },
   "errors": {
     "unknown": "Unbekannter Fehler",
     "network": "Netzwerkfehler",

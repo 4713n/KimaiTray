@@ -180,6 +180,11 @@
   "notifications": {
     "idleWhileTracking": "Ви були неактивні {{minutes}} хв під час відстеження \"{{project}}\""
   },
+  "tags": {
+    "label": "Теги",
+    "placeholder": "Додати тег…",
+    "addTags": "Додати теги…"
+  },
   "errors": {
     "unknown": "Невідома помилка",
     "network": "Помилка мережі",
