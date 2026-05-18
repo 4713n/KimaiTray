@@ -55,3 +55,9 @@ export {
   getActivitiesForProject,
   getActivity,
 } from "./activityApi";
+
+export {
+  saveApiToken,
+  getApiToken,
+  deleteApiToken,
+} from "./secureStore";

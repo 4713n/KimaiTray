@@ -1,7 +1,6 @@
 import type { AppSettings } from "../types";
 
 const SETTINGS_KEY = "kimaimate_settings";
-const TOKEN_KEY = "kimaimate_api_token";
 
 export const defaultSettings: AppSettings = {
   kimaiUrl: "",
@@ -36,13 +35,4 @@ export async function loadSettings(): Promise<AppSettings> {
 
 export async function saveSettings(settings: AppSettings): Promise<void> {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-}
-
-// Token stored separately — will migrate to OS keychain via Tauri plugin
-export async function getApiToken(): Promise<string> {
-  return localStorage.getItem(TOKEN_KEY) ?? "";
-}
-
-export async function setApiToken(token: string): Promise<void> {
-  localStorage.setItem(TOKEN_KEY, token);
 }
