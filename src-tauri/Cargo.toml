@@ -1,12 +1,12 @@
 [package]
-name = "kimaimare"
+name = "kimaitray"
 version = "0.1.0"
 description = "KimaiTray - Kimai time-tracking tray app"
 authors = ["you"]
 edition = "2021"
 
 [lib]
-name = "kimaimate_lib"
+name = "kimaitray_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

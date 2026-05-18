@@ -35,6 +35,7 @@ pub fn set_tray_icon(app: AppHandle, state: String) -> Result<(), String> {
 fn generate_state_icon(state: &str) -> Vec<u8> {
     let (r, g, b) = match state {
         "running" => (16, 185, 129),   // emerald-500
+        "paused" => (245, 158, 11),    // amber-500
         "error" => (239, 68, 68),      // red-500
         _ => (156, 163, 175),          // gray-400 (idle/disconnected)
     };

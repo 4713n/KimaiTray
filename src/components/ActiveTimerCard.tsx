@@ -102,23 +102,27 @@ export default function ActiveTimerCard({
   // ── Tag editing ──
   const [editingTags, setEditingTags] = useState(false);
   const [tagsValue, setTagsValue] = useState<string[]>([]);
+  const tagsRef = useRef<string[]>([]);
 
   const startEditTags = () => {
     if (!onEdit) return;
     setTagsValue([...timer.tags]);
+    tagsRef.current = [...timer.tags];
     setEditingTags(true);
   };
 
   const saveTags = (newTags: string[]) => {
     setTagsValue(newTags);
+    tagsRef.current = newTags;
   };
 
   const commitTags = () => {
     setEditingTags(false);
+    const current = tagsRef.current;
     const before = timer.tags.map((t) => t.toLowerCase()).sort().join(",");
-    const after = tagsValue.map((t) => t.toLowerCase()).sort().join(",");
+    const after = current.map((t) => t.toLowerCase()).sort().join(",");
     if (before !== after) {
-      onEdit?.(timer.id, { tags: tagsValue });
+      onEdit?.(timer.id, { tags: current });
     }
   };
 
@@ -246,7 +250,7 @@ export default function ActiveTimerCard({
                 commitTags();
               }
             }}>
-              <TagsInput tags={tagsValue} onChange={saveTags} />
+              <TagsInput tags={tagsValue} onChange={saveTags} onCommit={commitTags} />
             </div>
           ) : timer.tags.length > 0 ? (
             <div

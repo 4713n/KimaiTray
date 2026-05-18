@@ -5,6 +5,7 @@ import TagPill from "./TagPill";
 interface TagsInputProps {
   tags: string[];
   onChange: (tags: string[]) => void;
+  onCommit?: () => void;
   disabled?: boolean;
 }
 
@@ -25,6 +26,7 @@ function addTags(existing: string[], raw: string): string[] {
 export default function TagsInput({
   tags,
   onChange,
+  onCommit,
   disabled,
 }: TagsInputProps) {
   const { t } = useTranslation();
@@ -40,7 +42,14 @@ export default function TagsInput({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      commitInput();
+      if (input.trim()) {
+        commitInput();
+      } else if (onCommit) {
+        onCommit();
+      }
+    } else if (e.key === "Escape" && onCommit) {
+      e.preventDefault();
+      onCommit();
     } else if (e.key === "Backspace" && input === "" && tags.length > 0) {
       e.preventDefault();
       onChange(tags.slice(0, -1));
