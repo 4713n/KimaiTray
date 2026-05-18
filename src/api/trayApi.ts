@@ -16,7 +16,7 @@ export async function setTrayTitle(title: string): Promise<void> {
   }
 }
 
-export type TrayIconState = "idle" | "running" | "error";
+export type TrayIconState = "idle" | "running" | "paused" | "error";
 
 export async function setTrayIcon(state: TrayIconState): Promise<void> {
   try {

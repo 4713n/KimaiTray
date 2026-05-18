@@ -185,6 +185,12 @@
     "placeholder": "Přidat štítek…",
     "addTags": "Přidat štítky…"
   },
+  "pause": {
+    "pause": "Pauza",
+    "paused": "Pozastaveno",
+    "resume": "Pokračovat",
+    "pausedSince": "pozastaveno v {{time}}"
+  },
   "errors": {
     "unknown": "Neznámá chyba",
     "network": "Chyba sítě",

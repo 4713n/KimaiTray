@@ -7,7 +7,9 @@ import TagsInput from "./TagsInput";
 interface ActiveTimerCardProps {
   timer: ActiveTimer;
   onStop: () => void;
+  onPause?: () => void;
   isStopping?: boolean;
+  isPausing?: boolean;
   multipleActive?: boolean;
   onEdit?: (
     id: number,
@@ -42,7 +44,9 @@ function formatStartTime(iso: string): string {
 export default function ActiveTimerCard({
   timer,
   onStop,
+  onPause,
   isStopping,
+  isPausing,
   multipleActive,
   onEdit,
   isSaving,
@@ -297,17 +301,36 @@ export default function ActiveTimerCard({
               </button>
             )}
           </div>
-          <button
-            onClick={onStop}
-            disabled={isStopping}
-            className="px-2.5 py-1 text-[11px] font-medium rounded-md shrink-0 ml-2
-              bg-red-500/10 text-red-600 dark:text-red-400
-              hover:bg-red-500/20 active:bg-red-500/30
-              disabled:opacity-50 disabled:cursor-not-allowed
-              transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-red-400"
-          >
-            {isStopping ? t("tray.stopping") : t("timer.stopTimer")}
-          </button>
+          <div className="flex items-center gap-1.5 shrink-0 ml-2">
+            {onPause && (
+              <button
+                onClick={onPause}
+                disabled={!!isPausing || !!isStopping}
+                className="px-2.5 py-1 text-[11px] font-medium rounded-md
+                  bg-amber-500/10 text-amber-600 dark:text-amber-400
+                  hover:bg-amber-500/20 active:bg-amber-500/30
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                  transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-400"
+              >
+                {isPausing ? (
+                  <div className="h-3 w-3 animate-spin rounded-full border-2 border-amber-400/30 border-t-amber-500" />
+                ) : (
+                  t("pause.pause")
+                )}
+              </button>
+            )}
+            <button
+              onClick={onStop}
+              disabled={!!isStopping || !!isPausing}
+              className="px-2.5 py-1 text-[11px] font-medium rounded-md
+                bg-red-500/10 text-red-600 dark:text-red-400
+                hover:bg-red-500/20 active:bg-red-500/30
+                disabled:opacity-50 disabled:cursor-not-allowed
+                transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-red-400"
+            >
+              {isStopping ? t("tray.stopping") : t("timer.stopTimer")}
+            </button>
+          </div>
         </div>
 
         {/* Save error */}

@@ -185,6 +185,12 @@
     "placeholder": "Додати тег…",
     "addTags": "Додати теги…"
   },
+  "pause": {
+    "pause": "Пауза",
+    "paused": "Призупинено",
+    "resume": "Продовжити",
+    "pausedSince": "призупинено о {{time}}"
+  },
   "errors": {
     "unknown": "Невідома помилка",
     "network": "Помилка мережі",

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { getCurrentWindow, Window } from "@tauri-apps/api/window";
 import HeaderStatus from "../components/HeaderStatus";
 import ActiveTimerCard from "../components/ActiveTimerCard";
+import PausedTimerCard from "../components/PausedTimerCard";
 import EmptyTimerState from "../components/EmptyTimerState";
 import RecentTasksList from "../components/RecentTasksList";
 import PopupFooterActions from "../components/PopupFooterActions";
@@ -14,6 +15,7 @@ import { useRecentTasks } from "../hooks/useRecentTasks";
 import { useStartTask } from "../hooks/useStartTask";
 import type { StartTaskPayload } from "../hooks/useStartTask";
 import { useEditTimer } from "../hooks/useEditTimer";
+import { usePauseTimer } from "../hooks/usePauseTimer";
 import { useIdleDetection } from "../hooks/useIdleDetection";
 import { setTrayTooltip, setTrayTitle, setTrayIcon, updateTrayMenu } from "../api/trayApi";
 import { useAppearance } from "../hooks/useAppearance";
@@ -56,9 +58,20 @@ export default function TrayPopup() {
     multipleActive,
     status,
     errorMessage,
-    isStopping,
-    stopTimer,
   } = useActiveTimer(client, isConfigured, refreshInterval);
+
+  const {
+    pausedTimer,
+    isPaused,
+    pauseTimer,
+    resumeTimer,
+    fullStop,
+    isPausing,
+    isResuming,
+    isStopping,
+    pauseError,
+    dismissPauseError,
+  } = usePauseTimer(client, timer, baseUrl);
 
   const activeKey = timer ? `${timer.projectId}-${timer.activityId}` : null;
   const { tasks, isLoading: tasksLoading } = useRecentTasks(
@@ -187,13 +200,25 @@ export default function TrayPopup() {
       setTrayIcon("error");
     } else if (timer) {
       setTrayIcon("running");
+    } else if (isPaused) {
+      setTrayIcon("paused");
     } else {
       setTrayIcon("idle");
     }
-  }, [status, !!timer]);
+  }, [status, !!timer, isPaused]);
 
   // Update tray tooltip and menu bar title
   useEffect(() => {
+    if (isPaused && pausedTimer) {
+      setTrayTooltip(`KimaiMate — ${t("pause.paused")} — ${pausedTimer.project}`);
+      if (traySettings.menuBarLabelStyle !== "hidden") {
+        setTrayTitle(t("pause.paused"));
+      } else {
+        setTrayTitle("");
+      }
+      return;
+    }
+
     if (!timer) {
       setTrayTooltip("KimaiMate");
       setTrayTitle("");
@@ -207,10 +232,8 @@ export default function TrayPopup() {
       const elapsed = formatElapsed(secs);
       const elapsedTray = formatElapsed(secs, traySettings.showSecondsInTimer);
 
-      // Tooltip — always shows full info
       setTrayTooltip(`${timer.project} — ${timer.activity} — ${elapsed}`);
 
-      // Menu bar title (macOS) — driven by menuBarLabelStyle
       const { menuBarLabelStyle } = traySettings;
 
       if (menuBarLabelStyle === "hidden") {
@@ -233,7 +256,7 @@ export default function TrayPopup() {
       setTrayTooltip("KimaiMate");
       setTrayTitle("");
     };
-  }, [timer?.id, timer?.beginSeconds, timer?.project, timer?.activity, traySettings]);
+  }, [timer?.id, timer?.beginSeconds, timer?.project, timer?.activity, isPaused, pausedTimer, traySettings, t]);
 
   const handleStartRecent = (task: RecentTask) => {
     startTask(
@@ -283,24 +306,36 @@ export default function TrayPopup() {
           ) : timer ? (
             <ActiveTimerCard
               timer={timer}
-              onStop={stopTimer}
+              onStop={fullStop}
+              onPause={pauseTimer}
               isStopping={isStopping}
+              isPausing={isPausing}
               multipleActive={multipleActive}
               onEdit={editTimer}
               isSaving={isSaving}
               saveError={saveError}
             />
+          ) : isPaused && pausedTimer ? (
+            <PausedTimerCard
+              paused={pausedTimer}
+              onResume={resumeTimer}
+              onStop={fullStop}
+              isResuming={isResuming}
+              isStopping={isStopping}
+              error={pauseError}
+              onDismissError={dismissPauseError}
+            />
           ) : (
             <EmptyTimerState />
           )}
 
-          {switchError && (
+          {(switchError || (pauseError && timer)) && (
             <div className="mx-3 mt-1.5 flex items-start gap-2 rounded-md bg-red-50 dark:bg-red-950/30 border border-red-200/60 dark:border-red-800/40 px-2.5 py-2">
               <span className="text-[11px] text-red-600 dark:text-red-400 flex-1 leading-snug">
-                {switchError}
+                {switchError || pauseError}
               </span>
               <button
-                onClick={dismissError}
+                onClick={switchError ? dismissError : dismissPauseError}
                 className="text-red-400 hover:text-red-600 dark:text-red-500 dark:hover:text-red-300 text-xs leading-none shrink-0 p-0.5"
               >
                 ✕
@@ -315,7 +350,7 @@ export default function TrayPopup() {
             onStart={handleStartRecent}
             isLoading={status !== "unconfigured" && tasksLoading}
             startingKey={startingKey}
-            disabled={isStarting || isStopping}
+            disabled={isStarting || isStopping || isPausing || isResuming}
           />
 
           <PopupFooterActions

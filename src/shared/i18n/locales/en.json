@@ -185,6 +185,12 @@
     "placeholder": "Add tag…",
     "addTags": "Add tags…"
   },
+  "pause": {
+    "pause": "Pause",
+    "paused": "Paused",
+    "resume": "Resume",
+    "pausedSince": "paused at {{time}}"
+  },
   "errors": {
     "unknown": "Unknown error",
     "network": "Network error",
