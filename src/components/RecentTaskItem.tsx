@@ -3,17 +3,30 @@ import type { RecentTask } from "../types";
 interface RecentTaskItemProps {
   task: RecentTask;
   onStart: (task: RecentTask) => void;
+  isStarting?: boolean;
+  disabled?: boolean;
 }
 
-export default function RecentTaskItem({ task, onStart }: RecentTaskItemProps) {
+export default function RecentTaskItem({
+  task,
+  onStart,
+  isStarting,
+  disabled,
+}: RecentTaskItemProps) {
+  const subtitle = [task.customer, task.description]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <button
       onClick={() => onStart(task)}
+      disabled={disabled}
       className="group flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5
         text-left transition-colors
         hover:bg-gray-100 dark:hover:bg-gray-800
         focus:outline-none focus-visible:bg-gray-100 dark:focus-visible:bg-gray-800
-        focus-visible:ring-1 focus-visible:ring-blue-400"
+        focus-visible:ring-1 focus-visible:ring-blue-400
+        disabled:opacity-50 disabled:cursor-not-allowed"
     >
       <span
         className="inline-block h-2 w-2 shrink-0 rounded-full"
@@ -29,24 +42,30 @@ export default function RecentTaskItem({ task, onStart }: RecentTaskItemProps) {
             {task.activity}
           </span>
         </div>
-        <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">
-          {task.description}
-        </p>
+        {subtitle && (
+          <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">
+            {subtitle}
+          </p>
+        )}
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
         <span className="text-[10px] text-gray-300 dark:text-gray-600">
           {task.lastUsed}
         </span>
-        <svg
-          className="h-3.5 w-3.5 text-gray-300 dark:text-gray-600
-            group-hover:text-emerald-500 dark:group-hover:text-emerald-400
-            transition-colors"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path d="M8 5v14l11-7z" />
-        </svg>
+        {isStarting ? (
+          <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-200 border-t-emerald-500 dark:border-gray-600 dark:border-t-emerald-400" />
+        ) : (
+          <svg
+            className="h-3.5 w-3.5 text-gray-300 dark:text-gray-600
+              group-hover:text-emerald-500 dark:group-hover:text-emerald-400
+              transition-colors"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        )}
       </div>
     </button>
   );

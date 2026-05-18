@@ -4,9 +4,47 @@ import RecentTaskItem from "./RecentTaskItem";
 interface RecentTasksListProps {
   tasks: RecentTask[];
   onStart: (task: RecentTask) => void;
+  isLoading?: boolean;
+  startingKey?: string | null;
+  disabled?: boolean;
 }
 
-export default function RecentTasksList({ tasks, onStart }: RecentTasksListProps) {
+function LoadingSkeleton() {
+  return (
+    <div className="px-2.5 py-1.5 flex items-center gap-2.5 animate-pulse">
+      <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-gray-200 dark:bg-gray-700" />
+      <div className="flex-1 space-y-1">
+        <div className="h-3 w-24 rounded bg-gray-200 dark:bg-gray-700" />
+        <div className="h-2 w-16 rounded bg-gray-100 dark:bg-gray-800" />
+      </div>
+    </div>
+  );
+}
+
+export default function RecentTasksList({
+  tasks,
+  onStart,
+  isLoading,
+  startingKey,
+  disabled,
+}: RecentTasksListProps) {
+  if (isLoading) {
+    return (
+      <div className="mt-1.5 flex-1 min-h-0 flex flex-col">
+        <div className="px-3 py-1.5">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            Recent
+          </span>
+        </div>
+        <div className="px-1.5 pb-1">
+          <LoadingSkeleton />
+          <LoadingSkeleton />
+          <LoadingSkeleton />
+        </div>
+      </div>
+    );
+  }
+
   if (tasks.length === 0) return null;
 
   return (
@@ -18,7 +56,13 @@ export default function RecentTasksList({ tasks, onStart }: RecentTasksListProps
       </div>
       <div className="flex-1 overflow-y-auto px-1.5 pb-1">
         {tasks.map((task) => (
-          <RecentTaskItem key={task.id} task={task} onStart={onStart} />
+          <RecentTaskItem
+            key={task.key}
+            task={task}
+            onStart={onStart}
+            isStarting={startingKey === task.key}
+            disabled={disabled}
+          />
         ))}
       </div>
     </div>

@@ -8,9 +8,12 @@ export interface ActiveTimer {
 }
 
 export interface RecentTask {
-  id: number;
+  key: string;
+  projectId: number;
+  activityId: number;
   project: string;
   projectColor: string;
+  customer: string;
   activity: string;
   description: string;
   lastUsed: string;

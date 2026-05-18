@@ -7,10 +7,10 @@ import RecentTasksList from "../components/RecentTasksList";
 import PopupFooterActions from "../components/PopupFooterActions";
 import { useKimaiClient } from "../hooks/useKimaiClient";
 import { useActiveTimer } from "../hooks/useActiveTimer";
+import { useRecentTasks } from "../hooks/useRecentTasks";
+import { useStartTask } from "../hooks/useStartTask";
 import { setTrayTooltip } from "../api/trayApi";
 import { formatElapsed } from "../components/ActiveTimerCard";
-import { mockRecentTasks } from "../mock/data";
-import type { RecentTask } from "../types";
 
 export default function TrayPopup() {
   const { client, isConfigured, refreshInterval } = useKimaiClient();
@@ -23,7 +23,14 @@ export default function TrayPopup() {
     stopTimer,
   } = useActiveTimer(client, isConfigured, refreshInterval);
 
-  // ESC to hide
+  const { tasks, isLoading: tasksLoading } = useRecentTasks(
+    client,
+    isConfigured,
+  );
+
+  const { startTask, startingKey, switchError, dismissError, isStarting } =
+    useStartTask(client, timer?.id ?? null);
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") getCurrentWindow().hide();
@@ -32,7 +39,6 @@ export default function TrayPopup() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  // Update tray tooltip with elapsed time
   useEffect(() => {
     if (!timer) {
       setTrayTooltip("KimaiMate");
@@ -53,10 +59,6 @@ export default function TrayPopup() {
     };
   }, [timer?.id, timer?.beginSeconds, timer?.project]);
 
-  const handleStart = (_task: RecentTask) => {
-    /* TODO: start timesheet via API */
-  };
-
   return (
     <div className="flex h-screen w-screen flex-col bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-gray-100">
       <HeaderStatus status={status} errorMessage={errorMessage} />
@@ -76,9 +78,29 @@ export default function TrayPopup() {
         <EmptyTimerState />
       )}
 
+      {switchError && (
+        <div className="mx-3 mt-1.5 flex items-start gap-2 rounded-md bg-red-50 dark:bg-red-950/30 border border-red-200/60 dark:border-red-800/40 px-2.5 py-2">
+          <span className="text-[11px] text-red-600 dark:text-red-400 flex-1 leading-snug">
+            {switchError}
+          </span>
+          <button
+            onClick={dismissError}
+            className="text-red-400 hover:text-red-600 dark:text-red-500 dark:hover:text-red-300 text-xs leading-none shrink-0 p-0.5"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       <div className="mx-3 mt-2 border-t border-gray-100 dark:border-gray-800" />
 
-      <RecentTasksList tasks={mockRecentTasks} onStart={handleStart} />
+      <RecentTasksList
+        tasks={tasks}
+        onStart={startTask}
+        isLoading={status !== "unconfigured" && tasksLoading}
+        startingKey={startingKey}
+        disabled={isStarting || isStopping}
+      />
 
       <PopupFooterActions
         onNewTask={() => {}}
