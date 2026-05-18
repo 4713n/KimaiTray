@@ -4,23 +4,46 @@ import { createKimaiClient, type KimaiClient } from "../api/kimaiClient";
 import { getApiToken } from "../api/secureStore";
 import { loadSettings } from "../settings/service";
 
+interface IdleSettings {
+  enableIdleDetection: boolean;
+  idleThresholdMinutes: number;
+  idleAction: "ask" | "stop" | "discard" | "continue";
+  showIdleNotification: boolean;
+}
+
 interface UseKimaiClientResult {
   client: KimaiClient | null;
   isConfigured: boolean;
   refreshInterval: number;
   baseUrl: string;
+  idleSettings: IdleSettings;
 }
+
+const defaultIdleSettings: IdleSettings = {
+  enableIdleDetection: false,
+  idleThresholdMinutes: 5,
+  idleAction: "ask",
+  showIdleNotification: true,
+};
 
 export function useKimaiClient(): UseKimaiClientResult {
   const [baseUrl, setBaseUrl] = useState("");
   const [token, setToken] = useState("");
   const [refreshInterval, setRefreshInterval] = useState(60);
   const [ready, setReady] = useState(false);
+  const [idleSettings, setIdleSettings] =
+    useState<IdleSettings>(defaultIdleSettings);
 
   const load = useCallback(async () => {
     const s = await loadSettings();
     setBaseUrl(s.kimaiUrl);
     setRefreshInterval(s.refreshInterval);
+    setIdleSettings({
+      enableIdleDetection: s.enableIdleDetection,
+      idleThresholdMinutes: s.idleThresholdMinutes,
+      idleAction: s.idleAction,
+      showIdleNotification: s.showIdleNotification,
+    });
     if (s.kimaiUrl) {
       try {
         const t = await getApiToken(s.kimaiUrl);
@@ -62,5 +85,6 @@ export function useKimaiClient(): UseKimaiClientResult {
     isConfigured: ready && !!baseUrl && !!token,
     refreshInterval,
     baseUrl,
+    idleSettings,
   };
 }

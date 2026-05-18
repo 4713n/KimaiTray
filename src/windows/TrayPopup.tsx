@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getCurrentWindow, Window } from "@tauri-apps/api/window";
 import HeaderStatus from "../components/HeaderStatus";
 import ActiveTimerCard from "../components/ActiveTimerCard";
@@ -6,20 +6,25 @@ import EmptyTimerState from "../components/EmptyTimerState";
 import RecentTasksList from "../components/RecentTasksList";
 import PopupFooterActions from "../components/PopupFooterActions";
 import NewTaskForm from "../components/NewTaskForm";
+import IdleDialog from "../components/IdleDialog";
 import { useKimaiClient } from "../hooks/useKimaiClient";
 import { useActiveTimer } from "../hooks/useActiveTimer";
 import { useRecentTasks } from "../hooks/useRecentTasks";
 import { useStartTask } from "../hooks/useStartTask";
 import type { StartTaskPayload } from "../hooks/useStartTask";
 import { useEditTimer } from "../hooks/useEditTimer";
+import { useIdleDetection } from "../hooks/useIdleDetection";
 import { setTrayTooltip } from "../api/trayApi";
+import { updateTimesheet, stopTimesheet } from "../api/timesheetApi";
 import { formatElapsed } from "../components/ActiveTimerCard";
 import type { RecentTask } from "../types";
 
 export default function TrayPopup() {
   const [showNewTask, setShowNewTask] = useState(false);
+  const [idleProcessing, setIdleProcessing] = useState(false);
 
-  const { client, isConfigured, refreshInterval, baseUrl } = useKimaiClient();
+  const { client, isConfigured, refreshInterval, baseUrl, idleSettings } =
+    useKimaiClient();
   const {
     timer,
     multipleActive,
@@ -38,6 +43,101 @@ export default function TrayPopup() {
     useStartTask(client, timer?.id ?? null, () => setShowNewTask(false));
 
   const { editTimer, isSaving, saveError } = useEditTimer(client);
+
+  const {
+    idleState,
+    idleStartedAt,
+    idleDurationSeconds,
+    dismissIdle,
+  } = useIdleDetection(
+    idleSettings.enableIdleDetection,
+    idleSettings.idleThresholdMinutes,
+    !!timer,
+  );
+
+  // Send notification when user returns from idle
+  useEffect(() => {
+    if (idleState !== "returned" || !idleSettings.showIdleNotification) return;
+    import("@tauri-apps/plugin-notification").then(({ sendNotification }) => {
+      const mins = Math.round(idleDurationSeconds / 60);
+      sendNotification({
+        title: "KimaiMate",
+        body: `You were idle for ${mins} min while tracking "${timer?.project ?? "timer"}"`,
+      });
+    }).catch(() => {});
+  }, [idleState]);
+
+  // Auto-handle idle for non-"ask" actions
+  useEffect(() => {
+    if (idleState !== "returned" || idleSettings.idleAction === "ask") return;
+    if (!client || !timer) return;
+
+    const handle = async () => {
+      setIdleProcessing(true);
+      try {
+        if (idleSettings.idleAction === "continue") {
+          // Do nothing, just dismiss
+        } else if (idleSettings.idleAction === "stop") {
+          await stopTimesheet(client, timer.id);
+        } else if (idleSettings.idleAction === "discard" && idleStartedAt) {
+          await updateTimesheet(client, timer.id, {
+            end: idleStartedAt.toISOString(),
+          });
+        }
+      } catch {
+        // Ignore errors for auto-actions
+      } finally {
+        setIdleProcessing(false);
+        dismissIdle();
+      }
+    };
+    handle();
+  }, [idleState, idleSettings.idleAction]);
+
+  const handleIdleContinue = useCallback(() => {
+    dismissIdle();
+  }, [dismissIdle]);
+
+  const handleIdleStopAtStart = useCallback(async () => {
+    if (!client || !timer || !idleStartedAt) return;
+    setIdleProcessing(true);
+    try {
+      await updateTimesheet(client, timer.id, {
+        end: idleStartedAt.toISOString(),
+      });
+    } catch {
+      // fallback: just stop now
+      try { await stopTimesheet(client, timer.id); } catch {}
+    } finally {
+      setIdleProcessing(false);
+      dismissIdle();
+    }
+  }, [client, timer, idleStartedAt, dismissIdle]);
+
+  const handleIdleStopNow = useCallback(async () => {
+    if (!client || !timer) return;
+    setIdleProcessing(true);
+    try {
+      await stopTimesheet(client, timer.id);
+    } catch {}
+    setIdleProcessing(false);
+    dismissIdle();
+  }, [client, timer, dismissIdle]);
+
+  const handleIdleStopAndNew = useCallback(async () => {
+    if (!client || !timer || !idleStartedAt) return;
+    setIdleProcessing(true);
+    try {
+      await updateTimesheet(client, timer.id, {
+        end: idleStartedAt.toISOString(),
+      });
+    } catch {
+      try { await stopTimesheet(client, timer.id); } catch {}
+    }
+    setIdleProcessing(false);
+    dismissIdle();
+    setShowNewTask(true);
+  }, [client, timer, idleStartedAt, dismissIdle]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -88,8 +188,14 @@ export default function TrayPopup() {
     startTask(payload);
   };
 
+  const showIdleDialog =
+    idleState === "returned" &&
+    idleSettings.idleAction === "ask" &&
+    timer &&
+    idleStartedAt;
+
   return (
-    <div className="flex h-screen w-screen flex-col bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-gray-100">
+    <div className="relative flex h-screen w-screen flex-col bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-gray-100">
       <HeaderStatus status={status} errorMessage={errorMessage} />
 
       {showNewTask && client ? (
@@ -159,6 +265,19 @@ export default function TrayPopup() {
             }}
           />
         </>
+      )}
+
+      {showIdleDialog && (
+        <IdleDialog
+          timer={timer}
+          idleStartedAt={idleStartedAt}
+          idleDurationSeconds={idleDurationSeconds}
+          onContinue={handleIdleContinue}
+          onStopAtIdleStart={handleIdleStopAtStart}
+          onStopNow={handleIdleStopNow}
+          onStopAndStartNew={handleIdleStopAndNew}
+          isProcessing={idleProcessing}
+        />
       )}
     </div>
   );

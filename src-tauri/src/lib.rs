@@ -1,3 +1,4 @@
+mod idle;
 mod keychain;
 mod tray;
 
@@ -6,11 +7,13 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::default().build())
+        .plugin(tauri_plugin_notification::init())
         .invoke_handler(tauri::generate_handler![
             keychain::save_api_token,
             keychain::get_api_token,
             keychain::delete_api_token,
             tray::set_tray_tooltip,
+            idle::get_idle_seconds,
         ])
         .setup(|app| {
             tray::create_tray(app.handle())?;
