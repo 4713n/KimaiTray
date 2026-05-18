@@ -26,6 +26,14 @@ export async function setTrayIcon(state: TrayIconState): Promise<void> {
   }
 }
 
+export async function setPopupVibrancy(enabled: boolean): Promise<void> {
+  try {
+    await invoke("set_popup_vibrancy", { enabled });
+  } catch {
+    // best-effort — only works on macOS
+  }
+}
+
 export async function setPopupCornerRadius(radius: number): Promise<void> {
   try {
     await invoke("set_popup_corner_radius", { radius });

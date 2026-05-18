@@ -23,9 +23,9 @@ export default function RecentTaskItem({
       disabled={disabled}
       className="group flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5
         text-left transition-colors
-        hover:bg-gray-100 dark:hover:bg-gray-800
-        focus:outline-none focus-visible:bg-gray-100 dark:focus-visible:bg-gray-800
-        focus-visible:ring-1 focus-visible:ring-blue-400
+        hover:bg-gray-100 dark:hover:bg-white/[0.06]
+        focus:outline-none focus-visible:bg-gray-100 dark:focus-visible:bg-white/[0.06]
+        focus-visible:ring-1 focus-visible:ring-[var(--accent)]
         disabled:opacity-50 disabled:cursor-not-allowed"
     >
       <span
@@ -50,15 +50,15 @@ export default function RecentTaskItem({
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
-        <span className="text-[10px] text-gray-300 dark:text-gray-600">
+        <span className="text-[10px] text-gray-400 dark:text-gray-500">
           {task.lastUsed}
         </span>
         {isStarting ? (
-          <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-200 border-t-emerald-500 dark:border-gray-600 dark:border-t-emerald-400" />
+          <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-gray-200 border-t-[var(--accent)] dark:border-gray-600 dark:border-t-[var(--accent)]" />
         ) : (
           <svg
-            className="h-3.5 w-3.5 text-gray-300 dark:text-gray-600
-              group-hover:text-emerald-500 dark:group-hover:text-emerald-400
+            className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500
+              group-hover:text-[var(--accent)]
               transition-colors"
             fill="currentColor"
             viewBox="0 0 24 24"

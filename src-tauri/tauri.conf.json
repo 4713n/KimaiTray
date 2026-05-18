@@ -10,6 +10,7 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "label": "tray-popup",
@@ -22,7 +23,8 @@
         "skipTaskbar": true,
         "alwaysOnTop": true,
         "resizable": false,
-        "shadow": true
+        "shadow": true,
+        "transparent": true
       },
       {
         "label": "settings",

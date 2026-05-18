@@ -12,6 +12,16 @@ interface Props {
   update: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
 }
 
+const themeOptions: {
+  value: AppSettings["theme"];
+  label: string;
+  description: string;
+}[] = [
+  { value: "light", label: "Light", description: "Always light background" },
+  { value: "dark", label: "Dark", description: "Always dark background" },
+  { value: "transparent", label: "Transparent", description: "Frosted glass with blur" },
+];
+
 const accentOptions: { value: AppSettings["accentStyle"]; color: string }[] = [
   { value: "blue", color: "#3b82f6" },
   { value: "green", color: "#10b981" },
@@ -27,6 +37,66 @@ export default function AppearanceSection({ settings, update }: Props) {
       <SectionDescription>
         Customize the look and feel of KimaiTray.
       </SectionDescription>
+
+      <FieldGroup label="Theme" description="Popup window background style">
+        <div className="flex gap-2 mt-1">
+          {themeOptions.map((opt) => {
+            const active = settings.theme === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => update("theme", opt.value)}
+                className={`flex-1 flex flex-col items-center gap-1.5 rounded-lg border px-3 py-3 transition-colors
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]
+                  ${
+                    active
+                      ? "border-[var(--accent)] bg-[var(--accent-light)]"
+                      : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                  }`}
+              >
+                <div
+                  className={`h-8 w-full rounded-md border ${
+                    opt.value === "light"
+                      ? "bg-white border-gray-200"
+                      : opt.value === "dark"
+                        ? "bg-gray-900 border-gray-700"
+                        : "border-gray-300 dark:border-gray-600"
+                  }`}
+                  style={
+                    opt.value === "transparent"
+                      ? {
+                          background:
+                            "linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(200,200,255,0.2) 100%)",
+                          backdropFilter: "blur(4px)",
+                        }
+                      : undefined
+                  }
+                />
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={`inline-flex items-center justify-center h-3.5 w-3.5 rounded-full border shrink-0
+                      ${
+                        active
+                          ? "border-[var(--accent)]"
+                          : "border-gray-300 dark:border-gray-600"
+                      }`}
+                  >
+                    {active && (
+                      <span className="h-2 w-2 rounded-full bg-[var(--accent)]" />
+                    )}
+                  </span>
+                  <span className="text-[12px] text-gray-600 dark:text-gray-400">
+                    {opt.label}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </FieldGroup>
+
+      <Divider />
 
       <FieldGroup label="Rounded corners" description="Round the popup edges like native macOS tray apps" horizontal>
         <Toggle

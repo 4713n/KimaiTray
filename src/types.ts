@@ -37,6 +37,7 @@ export interface AppSettings {
   idleAction: "ask" | "stop" | "discard" | "continue";
   showIdleNotification: boolean;
 
+  theme: "light" | "dark" | "transparent";
   useCompactPopup: boolean;
   roundedPopupCorners: boolean;
   reduceVisualEffects: boolean;

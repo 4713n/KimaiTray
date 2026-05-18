@@ -21,6 +21,7 @@ export const defaultSettings: AppSettings = {
   idleAction: "ask",
   showIdleNotification: true,
 
+  theme: "light",
   useCompactPopup: false,
   roundedPopupCorners: true,
   reduceVisualEffects: false,

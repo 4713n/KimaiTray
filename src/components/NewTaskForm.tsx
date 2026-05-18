@@ -14,7 +14,7 @@ interface NewTaskFormProps {
 }
 
 const selectCls =
-  "w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1.5 text-xs text-gray-700 dark:text-gray-300 focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] focus:outline-none disabled:opacity-50";
+  "w-full rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.06] px-2.5 py-1.5 text-xs text-gray-700 dark:text-gray-300 focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] focus:outline-none disabled:opacity-40 transition-colors";
 
 export default function NewTaskForm({
   client,
@@ -97,33 +97,33 @@ export default function NewTaskForm({
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      <div className="flex items-center justify-between px-3 pt-2 pb-1">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-          New Task
-        </span>
+      <div className="flex items-center gap-2 px-3 pt-2.5 pb-1.5 border-b border-gray-100 dark:border-white/[0.06]">
         <button
           onClick={onCancel}
-          className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-0.5 -mr-0.5"
+          className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 -ml-0.5 p-0.5 rounded transition-colors"
         >
           <svg
             className="h-3.5 w-3.5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            strokeWidth={2}
+            strokeWidth={2.5}
           >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
+              d="M15.75 19.5L8.25 12l7.5-7.5"
             />
           </svg>
         </button>
+        <span className="text-[12px] font-semibold text-gray-700 dark:text-gray-200">
+          New Task
+        </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 space-y-2">
+      <div className="flex-1 overflow-y-auto px-3 pt-2.5 space-y-2.5">
         <div>
-          <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-0.5">
+          <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
             Customer
           </label>
           <select
@@ -146,8 +146,8 @@ export default function NewTaskForm({
         </div>
 
         <div>
-          <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-0.5">
-            Project <span className="text-red-400">*</span>
+          <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+            Project <span className="text-[var(--accent)]">*</span>
           </label>
           <select
             value={projectId ?? ""}
@@ -169,8 +169,8 @@ export default function NewTaskForm({
         </div>
 
         <div>
-          <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-0.5">
-            Activity <span className="text-red-400">*</span>
+          <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+            Activity <span className="text-[var(--accent)]">*</span>
           </label>
           <select
             value={activityId ?? ""}
@@ -192,7 +192,7 @@ export default function NewTaskForm({
         </div>
 
         <div>
-          <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-0.5">
+          <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
             Description
           </label>
           <input
@@ -206,14 +206,14 @@ export default function NewTaskForm({
         </div>
 
         <div>
-          <div className="flex items-center gap-1.5 mb-0.5">
+          <div className="flex items-center gap-1.5 mb-1">
             <label className="text-[10px] font-medium text-gray-500 dark:text-gray-400">
               Start time
             </label>
             <button
               type="button"
               onClick={() => setUseCustomTime(!useCustomTime)}
-              className="text-[9px] text-[var(--accent)] hover:underline"
+              className="text-[9px] font-medium text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors"
             >
               {useCustomTime ? "Use now" : "Custom"}
             </button>
@@ -234,26 +234,27 @@ export default function NewTaskForm({
         </div>
       </div>
 
-      <div className="flex items-center gap-2 px-3 py-2 border-t border-gray-100 dark:border-gray-800">
+      <div className="flex items-center gap-2 px-3 py-2.5 border-t border-gray-100 dark:border-white/[0.06]">
         <button
           onClick={onCancel}
           disabled={isSubmitting}
-          className="flex-1 rounded-md px-3 py-1.5 text-[11px] font-medium
-            text-gray-600 dark:text-gray-400
-            hover:bg-gray-100 dark:hover:bg-gray-800
-            disabled:opacity-50 disabled:cursor-not-allowed
-            transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-gray-400"
+          className="flex-1 rounded-lg px-3 py-1.5 text-[11px] font-medium
+            text-gray-500 dark:text-gray-400
+            border border-gray-200 dark:border-white/10
+            hover:bg-gray-50 dark:hover:bg-white/[0.04]
+            disabled:opacity-40 disabled:cursor-not-allowed
+            transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
         >
           Cancel
         </button>
         <button
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="flex-1 flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-medium
-            bg-emerald-500 text-white
-            hover:bg-emerald-600 active:bg-emerald-700
-            disabled:opacity-50 disabled:cursor-not-allowed
-            transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400"
+          className="flex-1 flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-semibold
+            bg-[var(--accent)] text-white
+            hover:bg-[var(--accent-hover)] active:brightness-90
+            disabled:opacity-40 disabled:cursor-not-allowed
+            transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
         >
           {isSubmitting ? (
             <div className="h-3 w-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />

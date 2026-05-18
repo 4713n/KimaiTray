@@ -1,4 +1,4 @@
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tauri::{
     image::Image,
@@ -98,6 +98,32 @@ fn position_popup(window: &WebviewWindow, tray_rect: &tauri::Rect) -> tauri::Res
     let y = tray_pos.y - win_size.height as i32;
 
     window.set_position(PhysicalPosition::new(x, y))?;
+    Ok(())
+}
+
+static VIBRANCY_APPLIED: AtomicBool = AtomicBool::new(false);
+
+#[tauri::command]
+pub fn set_popup_vibrancy(app: AppHandle, enabled: bool) -> Result<(), String> {
+    let window = app
+        .get_webview_window("tray-popup")
+        .ok_or("Popup not found")?;
+
+    #[cfg(target_os = "macos")]
+    if enabled && !VIBRANCY_APPLIED.swap(true, Ordering::SeqCst) {
+        use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
+        apply_vibrancy(
+            &window,
+            NSVisualEffectMaterial::Popover,
+            Some(NSVisualEffectState::Active),
+            None,
+        )
+        .map_err(|e| format!("{e}"))?;
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    let _ = (window, enabled);
+
     Ok(())
 }
 
