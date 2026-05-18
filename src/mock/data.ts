@@ -7,6 +7,7 @@ export const mockActiveTimer: ActiveTimer = {
   activity: "Development",
   description: "Implementing dashboard layout",
   beginSeconds: Math.floor(Date.now() / 1000) - 2 * 3600 - 15 * 60,
+  beginIso: new Date(Date.now() - (2 * 3600 + 15 * 60) * 1000).toISOString(),
 };
 
 export const mockRecentTasks: RecentTask[] = [

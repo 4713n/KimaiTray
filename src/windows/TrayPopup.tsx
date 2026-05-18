@@ -11,6 +11,7 @@ import { useActiveTimer } from "../hooks/useActiveTimer";
 import { useRecentTasks } from "../hooks/useRecentTasks";
 import { useStartTask } from "../hooks/useStartTask";
 import type { StartTaskPayload } from "../hooks/useStartTask";
+import { useEditTimer } from "../hooks/useEditTimer";
 import { setTrayTooltip } from "../api/trayApi";
 import { formatElapsed } from "../components/ActiveTimerCard";
 import type { RecentTask } from "../types";
@@ -35,6 +36,8 @@ export default function TrayPopup() {
 
   const { startTask, startingKey, switchError, dismissError, isStarting } =
     useStartTask(client, timer?.id ?? null, () => setShowNewTask(false));
+
+  const { editTimer, isSaving, saveError } = useEditTimer(client);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -109,6 +112,9 @@ export default function TrayPopup() {
               onStop={stopTimer}
               isStopping={isStopping}
               multipleActive={multipleActive}
+              onEdit={editTimer}
+              isSaving={isSaving}
+              saveError={saveError}
             />
           ) : (
             <EmptyTimerState />

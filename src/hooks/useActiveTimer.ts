@@ -68,6 +68,7 @@ export function useActiveTimer(
       activity: act?.name ?? `Activity #${entry.activity}`,
       description: entry.description ?? "",
       beginSeconds: Math.floor(new Date(entry.begin).getTime() / 1000),
+      beginIso: entry.begin,
     };
   }, [entries, projects, activities]);
 

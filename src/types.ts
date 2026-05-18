@@ -5,6 +5,7 @@ export interface ActiveTimer {
   activity: string;
   description: string;
   beginSeconds: number;
+  beginIso: string;
 }
 
 export interface RecentTask {
