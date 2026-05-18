@@ -2,6 +2,8 @@ import type { ActiveTimer, RecentTask } from "../types";
 
 export const mockActiveTimer: ActiveTimer = {
   id: 1,
+  projectId: 1,
+  activityId: 1,
   project: "Website Redesign",
   projectColor: "#10b981",
   activity: "Development",

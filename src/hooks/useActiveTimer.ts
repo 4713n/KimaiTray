@@ -66,6 +66,8 @@ export function useActiveTimer(
     const act = activities.find((a) => a.id === activityId);
     return {
       id: entry.id,
+      projectId,
+      activityId,
       project: proj?.name ?? `Project #${projectId}`,
       projectColor: proj?.color ?? "#6b7280",
       activity: act?.name ?? `Activity #${activityId}`,
@@ -79,6 +81,7 @@ export function useActiveTimer(
     mutationFn: (id: number) => stopTimesheet(client!, id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["active-timesheets"] });
+      qc.invalidateQueries({ queryKey: ["recent-timesheets"] });
     },
   });
 

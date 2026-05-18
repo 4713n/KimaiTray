@@ -1,5 +1,7 @@
 export interface ActiveTimer {
   id: number;
+  projectId: number;
+  activityId: number;
   project: string;
   projectColor: string;
   activity: string;

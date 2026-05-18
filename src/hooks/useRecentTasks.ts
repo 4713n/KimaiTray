@@ -24,6 +24,7 @@ function formatRelativeDate(iso: string): string {
 export function useRecentTasks(
   client: KimaiClient | null,
   isConfigured: boolean,
+  activeKey?: string | null,
 ) {
   const enabled = !!client && isConfigured;
 
@@ -56,7 +57,9 @@ export function useRecentTasks(
   });
 
   const tasks = useMemo<RecentTask[]>(() => {
-    const entries = recentQ.data ?? [];
+    const entries = [...(recentQ.data ?? [])].sort(
+      (a, b) => new Date(b.begin).getTime() - new Date(a.begin).getTime(),
+    );
     const projects = projectsQ.data ?? [];
     const activities = activitiesQ.data ?? [];
     const customers = customersQ.data ?? [];
@@ -69,6 +72,7 @@ export function useRecentTasks(
       const activityId = extractId(entry.activity);
       const key = `${projectId}-${activityId}`;
       if (seen.has(key)) continue;
+      if (activeKey && key === activeKey) continue;
       seen.add(key);
 
       const proj = projects.find((p) => p.id === projectId);
@@ -93,7 +97,7 @@ export function useRecentTasks(
     }
 
     return result;
-  }, [recentQ.data, projectsQ.data, activitiesQ.data, customersQ.data]);
+  }, [recentQ.data, projectsQ.data, activitiesQ.data, customersQ.data, activeKey]);
 
   return {
     tasks,

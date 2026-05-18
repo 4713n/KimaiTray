@@ -37,9 +37,11 @@ export default function TrayPopup() {
     stopTimer,
   } = useActiveTimer(client, isConfigured, refreshInterval);
 
+  const activeKey = timer ? `${timer.projectId}-${timer.activityId}` : null;
   const { tasks, isLoading: tasksLoading } = useRecentTasks(
     client,
     isConfigured,
+    activeKey,
   );
 
   const { startTask, startingKey, switchError, dismissError, isStarting } =
