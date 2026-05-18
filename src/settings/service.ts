@@ -14,6 +14,7 @@ export const defaultSettings: AppSettings = {
   showElapsedInTray: true,
   showTaskNameInTray: false,
   menuBarLabelStyle: "timer",
+  showSecondsInTimer: true,
 
   enableIdleDetection: false,
   idleThresholdMinutes: 5,
@@ -49,4 +50,14 @@ export async function saveSettings(settings: AppSettings): Promise<void> {
   const store = await getStore();
   await store.set(SETTINGS_KEY, settings);
   await store.save();
+}
+
+export async function onSettingsChange(
+  cb: (settings: AppSettings) => void,
+): Promise<() => void> {
+  const store = await getStore();
+  const unlisten = await store.onKeyChange<AppSettings>(SETTINGS_KEY, (val) => {
+    cb(val ? { ...defaultSettings, ...val } : { ...defaultSettings });
+  });
+  return unlisten;
 }

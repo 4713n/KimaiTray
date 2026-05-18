@@ -15,6 +15,7 @@ import type { StartTaskPayload } from "../hooks/useStartTask";
 import { useEditTimer } from "../hooks/useEditTimer";
 import { useIdleDetection } from "../hooks/useIdleDetection";
 import { setTrayTooltip, setTrayTitle, setTrayIcon } from "../api/trayApi";
+import { useAppearance } from "../hooks/useAppearance";
 import { updateTimesheet, stopTimesheet } from "../api/timesheetApi";
 import { formatElapsed } from "../components/ActiveTimerCard";
 import type { RecentTask } from "../types";
@@ -23,7 +24,9 @@ export default function TrayPopup() {
   const [showNewTask, setShowNewTask] = useState(false);
   const [idleProcessing, setIdleProcessing] = useState(false);
 
-  const { client, isConfigured, refreshInterval, baseUrl, idleSettings, traySettings } =
+  useAppearance();
+
+  const { client, isConfigured, refreshInterval, baseUrl, openKimaiInBrowser, idleSettings, traySettings } =
     useKimaiClient();
   const {
     timer,
@@ -177,35 +180,26 @@ export default function TrayPopup() {
         Math.floor(Date.now() / 1000) - timer.beginSeconds,
       );
       const elapsed = formatElapsed(secs);
+      const elapsedTray = formatElapsed(secs, traySettings.showSecondsInTimer);
 
       // Tooltip — always shows full info
       setTrayTooltip(`${timer.project} — ${timer.activity} — ${elapsed}`);
 
-      // Menu bar title (macOS) — driven by settings
-      const { menuBarLabelStyle, showElapsedInTray, showTaskNameInTray } = traySettings;
+      // Menu bar title (macOS) — driven by menuBarLabelStyle
+      const { menuBarLabelStyle } = traySettings;
 
       if (menuBarLabelStyle === "hidden") {
         setTrayTitle("");
         return;
       }
 
-      const parts: string[] = [];
-
-      if (showTaskNameInTray) {
-        if (menuBarLabelStyle === "project") {
-          parts.push(timer.project);
-        } else if (menuBarLabelStyle === "activity") {
-          parts.push(timer.activity);
-        } else {
-          parts.push(timer.project);
-        }
+      if (menuBarLabelStyle === "timer") {
+        setTrayTitle(elapsedTray);
+      } else if (menuBarLabelStyle === "project") {
+        setTrayTitle(timer.project);
+      } else if (menuBarLabelStyle === "activity") {
+        setTrayTitle(timer.activity);
       }
-
-      if (showElapsedInTray) {
-        parts.push(elapsed);
-      }
-
-      setTrayTitle(parts.join(" — "));
     };
     tick();
     const id = setInterval(tick, 1000);
@@ -295,6 +289,7 @@ export default function TrayPopup() {
 
           <PopupFooterActions
             onNewTask={() => setShowNewTask(true)}
+            showOpenKimai={openKimaiInBrowser}
             onOpenKimai={async () => {
               const { openUrl } = await import("@tauri-apps/plugin-opener");
               if (baseUrl) openUrl(baseUrl);

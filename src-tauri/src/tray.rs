@@ -20,8 +20,8 @@ pub fn set_tray_tooltip(app: AppHandle, text: String) -> Result<(), String> {
 #[tauri::command]
 pub fn set_tray_title(app: AppHandle, title: String) -> Result<(), String> {
     let tray = app.tray_by_id("main").ok_or("Tray icon not found")?;
-    let t = if title.is_empty() { None } else { Some(title) };
-    tray.set_title(t.as_deref()).map_err(|e| e.to_string())
+    // Always pass Some — tray-icon's macOS impl ignores None instead of clearing
+    tray.set_title(Some(&title)).map_err(|e| e.to_string())
 }
 
 #[tauri::command]

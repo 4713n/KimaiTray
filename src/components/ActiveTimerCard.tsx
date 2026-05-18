@@ -14,11 +14,12 @@ interface ActiveTimerCardProps {
   saveError?: string | null;
 }
 
-function formatElapsed(seconds: number): string {
+function formatElapsed(seconds: number, showSeconds = true): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = seconds % 60;
   const pad = (n: number) => String(n).padStart(2, "0");
+  if (!showSeconds) return `${pad(h)}:${pad(m)}`;
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 

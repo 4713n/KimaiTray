@@ -1,3 +1,4 @@
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { Divider, SectionTitle } from "./Controls";
 
 function LinkButton({
@@ -12,10 +13,7 @@ function LinkButton({
   return (
     <button
       type="button"
-      onClick={() => {
-        /* TODO: open URL via Tauri opener plugin */
-        console.log("open:", href);
-      }}
+      onClick={() => { openUrl(href).catch(() => {}); }}
       className="flex items-center gap-2 rounded-md px-3 py-2 text-[12px] text-gray-600
         hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800
         focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-400
@@ -100,18 +98,18 @@ export default function AboutSection() {
           <DonateButton
             label="Ko-fi"
             color="#FF5E5B"
-            onClick={() => console.log("open: ko-fi")}
+            onClick={() => openUrl("https://ko-fi.com/kimaimate").catch(() => {})}
           />
           <DonateButton
             label="GitHub Sponsors"
             color="#db61a2"
-            onClick={() => console.log("open: github sponsors")}
+            onClick={() => openUrl("https://github.com/sponsors/engazan").catch(() => {})}
           />
           <DonateButton
             label="Buy Me a Coffee"
             color="#FFDD00"
             textDark
-            onClick={() => console.log("open: bmac")}
+            onClick={() => openUrl("https://buymeacoffee.com/kimaimate").catch(() => {})}
           />
         </div>
       </div>
