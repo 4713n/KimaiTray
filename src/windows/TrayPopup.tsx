@@ -64,7 +64,7 @@ export default function TrayPopup() {
     import("@tauri-apps/plugin-notification").then(({ sendNotification }) => {
       const mins = Math.round(idleDurationSeconds / 60);
       sendNotification({
-        title: "KimaiMate",
+        title: "KimaiTray",
         body: `You were idle for ${mins} min while tracking "${timer?.project ?? "timer"}"`,
       });
     }).catch(() => {});
@@ -170,7 +170,7 @@ export default function TrayPopup() {
   // Update tray tooltip and menu bar title
   useEffect(() => {
     if (!timer) {
-      setTrayTooltip("KimaiMate");
+      setTrayTooltip("KimaiTray");
       setTrayTitle("");
       return;
     }
@@ -205,7 +205,7 @@ export default function TrayPopup() {
     const id = setInterval(tick, 1000);
     return () => {
       clearInterval(id);
-      setTrayTooltip("KimaiMate");
+      setTrayTooltip("KimaiTray");
       setTrayTitle("");
     };
   }, [timer?.id, timer?.beginSeconds, timer?.project, timer?.activity, traySettings]);

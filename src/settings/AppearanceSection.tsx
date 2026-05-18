@@ -25,7 +25,7 @@ export default function AppearanceSection({ settings, update }: Props) {
     <div>
       <SectionTitle>Appearance</SectionTitle>
       <SectionDescription>
-        Customize the look and feel of KimaiMate.
+        Customize the look and feel of KimaiTray.
       </SectionDescription>
 
       <FieldGroup label="Compact popup" description="Use a smaller, denser layout for the tray popup" horizontal>

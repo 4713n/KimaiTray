@@ -34,7 +34,7 @@ export default function HeaderStatus({
           className={`inline-block h-1.5 w-1.5 rounded-full ${DOT_STYLES[status]}`}
         />
         <span className="text-[11px] font-semibold tracking-wide text-gray-500 dark:text-gray-400 uppercase">
-          KimaiMate
+          KimaiTray
         </span>
       </div>
       {label && (

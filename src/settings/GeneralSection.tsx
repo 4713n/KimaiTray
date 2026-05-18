@@ -43,7 +43,7 @@ export default function GeneralSection({ settings, update }: Props) {
         Configure startup behavior and data refresh.
       </SectionDescription>
 
-      <FieldGroup label="Launch at login" description="Start KimaiMate automatically when you log in" horizontal>
+      <FieldGroup label="Launch at login" description="Start KimaiTray automatically when you log in" horizontal>
         <Toggle
           checked={autostart}
           onChange={toggleAutostart}

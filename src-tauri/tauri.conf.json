@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "KimaiMate",
+  "productName": "KimaiTray",
   "version": "0.1.0",
   "identifier": "eu.engazan.kimaimate",
   "build": {
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "tray-popup",
-        "title": "KimaiMate",
+        "title": "KimaiTray",
         "url": "/",
         "width": 360,
         "height": 520,
@@ -26,7 +26,7 @@
       },
       {
         "label": "settings",
-        "title": "KimaiMate - Settings",
+        "title": "KimaiTray - Settings",
         "url": "/",
         "width": 780,
         "height": 600,

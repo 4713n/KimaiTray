@@ -5,19 +5,25 @@ function LinkButton({
   label,
   href,
   icon,
+  disabled,
 }: {
   label: string;
   href: string;
   icon: React.ReactNode;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
-      onClick={() => { openUrl(href).catch(() => {}); }}
-      className="flex items-center gap-2 rounded-md px-3 py-2 text-[12px] text-gray-600
-        hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800
+      onClick={() => { if (!disabled) openUrl(href).catch(() => {}); }}
+      disabled={disabled}
+      className={`flex items-center gap-2 rounded-md px-3 py-2 text-[12px]
         focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-400
-        transition-colors w-full text-left"
+        transition-colors w-full text-left
+        ${disabled
+          ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
+          : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+        }`}
     >
       {icon}
       {label}
@@ -50,7 +56,7 @@ export default function AboutSection() {
 
       <div className="mb-5 rounded-lg bg-gray-50 px-4 py-4 dark:bg-gray-800/50">
         <div className="text-[15px] font-semibold text-gray-800 dark:text-gray-200">
-          KimaiMate
+          KimaiTray
         </div>
         <div className="text-[12px] text-gray-500 dark:text-gray-400">
           Version 0.1.0
@@ -66,21 +72,25 @@ export default function AboutSection() {
           label="GitHub Repository"
           href="https://github.com/engazan/kimaimate"
           icon={<ExternalIcon />}
+          disabled
         />
         <LinkButton
           label="Website"
           href="https://kimaimate.app"
           icon={<ExternalIcon />}
+          disabled
         />
         <LinkButton
           label="Report an Issue"
           href="https://github.com/engazan/kimaimate/issues"
           icon={<ExternalIcon />}
+          disabled
         />
         <LinkButton
           label="Privacy Policy"
           href="https://kimaimate.app/privacy"
           icon={<ExternalIcon />}
+          disabled
         />
       </div>
 
@@ -88,10 +98,10 @@ export default function AboutSection() {
 
       <div className="mt-1">
         <div className="mb-2 text-[13px] font-medium text-gray-700 dark:text-gray-300">
-          Support KimaiMate
+          Support KimaiTray
         </div>
         <p className="mb-3 text-[12px] text-gray-400 dark:text-gray-500">
-          KimaiMate is free for everyone — no premium tiers, no paywalls.
+          KimaiTray is free for everyone — no premium tiers, no paywalls.
           If you find it useful, consider supporting development.
         </p>
         <div className="flex flex-wrap gap-2">
@@ -99,6 +109,7 @@ export default function AboutSection() {
             label="Ko-fi"
             color="#FF5E5B"
             onClick={() => openUrl("https://ko-fi.com/kimaimate").catch(() => {})}
+            disabled
           />
           <DonateButton
             label="GitHub Sponsors"
@@ -110,6 +121,7 @@ export default function AboutSection() {
             color="#FFDD00"
             textDark
             onClick={() => openUrl("https://buymeacoffee.com/kimaimate").catch(() => {})}
+            disabled
           />
         </div>
       </div>
@@ -117,7 +129,7 @@ export default function AboutSection() {
       <Divider />
 
       <div className="text-[11px] text-gray-300 dark:text-gray-600">
-        Made with care. © 2025 KimaiMate contributors.
+        Made with care. © 2025 KimaiTray contributors.
       </div>
     </div>
   );
@@ -128,19 +140,22 @@ function DonateButton({
   color,
   textDark,
   onClick,
+  disabled,
 }: {
   label: string;
   color: string;
   textDark?: boolean;
   onClick: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
-      onClick={onClick}
-      className="rounded-md px-3 py-1.5 text-[12px] font-medium transition-opacity
-        hover:opacity-85 active:opacity-75
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-blue-400"
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      className={`rounded-md px-3 py-1.5 text-[12px] font-medium transition-opacity
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-blue-400
+        ${disabled ? "opacity-40 cursor-not-allowed" : "hover:opacity-85 active:opacity-75"}`}
       style={{
         backgroundColor: color,
         color: textDark ? "#1a1a1a" : "#ffffff",

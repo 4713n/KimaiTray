@@ -1,7 +1,7 @@
 [package]
 name = "kimaimare"
 version = "0.1.0"
-description = "KimaiMate - Kimai time-tracking tray app"
+description = "KimaiTray - Kimai time-tracking tray app"
 authors = ["you"]
 edition = "2021"
 
