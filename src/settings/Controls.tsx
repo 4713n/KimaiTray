@@ -239,7 +239,7 @@ function keyEventToAccelerator(e: KeyboardEvent): string | null {
   return parts.join("+");
 }
 
-function formatAcceleratorForDisplay(accel: string): string {
+export function formatAcceleratorForDisplay(accel: string): string {
   if (!accel) return "";
   return accel
     .split("+")

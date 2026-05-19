@@ -1,6 +1,6 @@
 use log::{error, info};
 use tauri::{AppHandle, Emitter, Manager};
-use tauri_plugin_global_shortcut::GlobalShortcutExt;
+use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 use tauri_plugin_store::StoreExt;
 
 use crate::tray;
@@ -19,8 +19,10 @@ pub fn register_shortcuts(
 
     if !toggle_popup.is_empty() {
         let handle = app.clone();
-        gs.on_shortcut(toggle_popup.as_str(), move |_app, _shortcut, _event| {
-            tray::toggle_popup_window(&handle);
+        gs.on_shortcut(toggle_popup.as_str(), move |_app, _shortcut, event| {
+            if event.state == ShortcutState::Pressed {
+                tray::toggle_popup_window(&handle);
+            }
         })
         .map_err(|e| format!("Toggle popup shortcut: {e}"))?;
         info!("Registered toggle-popup shortcut: {toggle_popup}");
@@ -28,9 +30,11 @@ pub fn register_shortcuts(
 
     if !start_stop_timer.is_empty() {
         let handle = app.clone();
-        gs.on_shortcut(start_stop_timer.as_str(), move |_app, _shortcut, _event| {
-            if let Some(popup) = handle.get_webview_window("tray-popup") {
-                let _ = popup.emit("kimai://toggle-timer", ());
+        gs.on_shortcut(start_stop_timer.as_str(), move |_app, _shortcut, event| {
+            if event.state == ShortcutState::Pressed {
+                if let Some(popup) = handle.get_webview_window("tray-popup") {
+                    let _ = popup.emit("kimai://toggle-timer", ());
+                }
             }
         })
         .map_err(|e| format!("Start/stop timer shortcut: {e}"))?;
@@ -39,8 +43,10 @@ pub fn register_shortcuts(
 
     if !open_settings.is_empty() {
         let handle = app.clone();
-        gs.on_shortcut(open_settings.as_str(), move |_app, _shortcut, _event| {
-            tray::show_settings_window(&handle);
+        gs.on_shortcut(open_settings.as_str(), move |_app, _shortcut, event| {
+            if event.state == ShortcutState::Pressed {
+                tray::show_settings_window(&handle);
+            }
         })
         .map_err(|e| format!("Open settings shortcut: {e}"))?;
         info!("Registered open-settings shortcut: {open_settings}");

@@ -23,6 +23,7 @@ import { useHiddenTasks } from "../hooks/useHiddenTasks";
 import { useDeleteTimesheet } from "../hooks/useDeleteTimesheet";
 import { useIdleDetection } from "../hooks/useIdleDetection";
 import { setTrayTooltip, setTrayTitle, setTrayIcon, updateTrayMenu, registerShortcuts } from "../api/trayApi";
+import { formatAcceleratorForDisplay } from "../settings/Controls";
 import { useAppearance } from "../hooks/useAppearance";
 import { useLanguageSync } from "../hooks/useLanguageSync";
 import { useUpdater } from "../hooks/useUpdater";
@@ -50,16 +51,6 @@ export default function TrayPopup() {
     return () => { unlisten.then((fn) => fn()); };
   }, [qc]);
 
-  useEffect(() => {
-    updateTrayMenu({
-      toggleLabel: t("common.showHide"),
-      settingsLabel: t("common.settings"),
-      openKimaiLabel: t("common.openKimai"),
-      refreshLabel: t("common.refresh"),
-      quitLabel: t("common.quit"),
-    });
-  }, [i18n.language, t]);
-
   const {
     client,
     isConfigured,
@@ -73,6 +64,19 @@ export default function TrayPopup() {
     activeConnectionId,
     switchConnection,
   } = useKimaiClient();
+
+  useEffect(() => {
+    const shortcutHint = shortcutSettings.shortcutTogglePopup
+      ? `  ${formatAcceleratorForDisplay(shortcutSettings.shortcutTogglePopup)}`
+      : "";
+    updateTrayMenu({
+      toggleLabel: t("common.showHide") + shortcutHint,
+      settingsLabel: t("common.settings"),
+      openKimaiLabel: t("common.openKimai"),
+      refreshLabel: t("common.refresh"),
+      quitLabel: t("common.quit"),
+    });
+  }, [i18n.language, t, shortcutSettings.shortcutTogglePopup]);
   const {
     timer,
     multipleActive,

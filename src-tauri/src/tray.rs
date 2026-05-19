@@ -213,7 +213,14 @@ pub fn toggle_popup_window(app: &AppHandle) {
         if popup.is_visible().unwrap_or(false) {
             let _ = popup.hide();
         } else {
+            // Move off-screen before showing to avoid flash at old position
+            let _ = popup.set_position(PhysicalPosition::new(-10000, -10000));
             let _ = popup.show();
+            if let Some(tray) = app.tray_by_id("main") {
+                if let Ok(Some(rect)) = tray.rect() {
+                    let _ = position_popup(&popup, &rect);
+                }
+            }
             let _ = popup.set_focus();
         }
     }
