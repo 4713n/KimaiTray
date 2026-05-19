@@ -5,9 +5,14 @@ import RecentTaskItem from "./RecentTaskItem";
 interface RecentTasksListProps {
   tasks: RecentTask[];
   onStart: (task: RecentTask) => void;
+  onHide: (task: RecentTask) => void;
+  onDelete: (task: RecentTask) => void;
   isLoading?: boolean;
   startingKey?: string | null;
+  deletingId?: number | null;
   disabled?: boolean;
+  hiddenCount?: number;
+  onShowAll?: () => void;
 }
 
 function LoadingSkeleton() {
@@ -25,9 +30,14 @@ function LoadingSkeleton() {
 export default function RecentTasksList({
   tasks,
   onStart,
+  onHide,
+  onDelete,
   isLoading,
   startingKey,
+  deletingId,
   disabled,
+  hiddenCount = 0,
+  onShowAll,
 }: RecentTasksListProps) {
   const { t } = useTranslation();
 
@@ -48,14 +58,22 @@ export default function RecentTasksList({
     );
   }
 
-  if (tasks.length === 0) return null;
+  if (tasks.length === 0 && hiddenCount === 0) return null;
 
   return (
     <div className="mt-1.5">
-      <div className="px-3 py-1.5">
+      <div className="px-3 py-1.5 flex items-center justify-between">
         <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
           {t("tray.recentTasks")}
         </span>
+        {hiddenCount > 0 && onShowAll && (
+          <button
+            onClick={onShowAll}
+            className="text-[9px] text-gray-400 dark:text-gray-500 hover:text-[var(--accent)] transition-colors"
+          >
+            {t("recentActions.hiddenCount", { count: hiddenCount })} · {t("recentActions.showAll")}
+          </button>
+        )}
       </div>
       <div className="px-1.5 pb-1">
         {tasks.map((task) => (
@@ -63,7 +81,10 @@ export default function RecentTasksList({
             key={task.key}
             task={task}
             onStart={onStart}
+            onHide={onHide}
+            onDelete={onDelete}
             isStarting={startingKey === task.key}
+            isDeleting={deletingId === task.timesheetId}
             disabled={disabled}
           />
         ))}

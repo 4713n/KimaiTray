@@ -191,6 +191,13 @@
     "resume": "Pokračovat",
     "pausedSince": "pozastaveno v {{time}}"
   },
+  "recentActions": {
+    "hideFromRecents": "Skrýt z nedávných",
+    "deleteFromKimai": "Smazat z Kimai",
+    "confirmDelete": "Smazat tento záznam?",
+    "hiddenCount": "{{count}} skrytých",
+    "showAll": "Zobrazit vše"
+  },
   "today": {
     "title": "Dnes",
     "empty": "Zatím žádné záznamy",

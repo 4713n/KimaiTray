@@ -86,6 +86,7 @@ export function useRecentTasks(
         key,
         projectId,
         activityId,
+        timesheetId: entry.id,
         project: proj?.name ?? `Project #${projectId}`,
         projectColor: proj?.color ?? "#6b7280",
         customer: cust?.name ?? "",

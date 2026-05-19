@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
 import { getCurrentWindow, Window } from "@tauri-apps/api/window";
@@ -19,6 +19,8 @@ import { useStartTask } from "../hooks/useStartTask";
 import type { StartTaskPayload } from "../hooks/useStartTask";
 import { useEditTimer } from "../hooks/useEditTimer";
 import { usePauseTimer } from "../hooks/usePauseTimer";
+import { useHiddenTasks } from "../hooks/useHiddenTasks";
+import { useDeleteTimesheet } from "../hooks/useDeleteTimesheet";
 import { useIdleDetection } from "../hooks/useIdleDetection";
 import { setTrayTooltip, setTrayTitle, setTrayIcon, updateTrayMenu } from "../api/trayApi";
 import { useAppearance } from "../hooks/useAppearance";
@@ -102,6 +104,8 @@ export default function TrayPopup() {
     useStartTask(client, timer?.id ?? null, () => setShowNewTask(false));
 
   const { editTimer, isSaving, saveError } = useEditTimer(client);
+  const { hiddenKeys, hideTask, clearAll: clearHidden } = useHiddenTasks();
+  const { deleteEntry, deletingId, deleteError: timesheetDeleteError, dismissError: dismissDeleteError } = useDeleteTimesheet(client);
 
   const {
     idleState,
@@ -276,6 +280,13 @@ export default function TrayPopup() {
     };
   }, [timer?.id, timer?.beginSeconds, timer?.project, timer?.activity, isPaused, pausedTimer, traySettings, t]);
 
+  const visibleTasks = useMemo(
+    () => tasks.filter((t) => !hiddenKeys.has(t.key)),
+    [tasks, hiddenKeys],
+  );
+
+  const hiddenCount = hiddenKeys.size;
+
   const handleStartRecent = (task: RecentTask) => {
     startTask(
       {
@@ -286,6 +297,16 @@ export default function TrayPopup() {
       task.key,
     );
   };
+
+  const handleHideRecent = useCallback(
+    (task: RecentTask) => hideTask(task.key),
+    [hideTask],
+  );
+
+  const handleDeleteRecent = useCallback(
+    (task: RecentTask) => deleteEntry(task.timesheetId),
+    [deleteEntry],
+  );
 
   const handleNewTaskSubmit = (payload: StartTaskPayload) => {
     startTask(payload);
@@ -364,13 +385,13 @@ export default function TrayPopup() {
             <EmptyTimerState />
           )}
 
-          {(switchError || (pauseError && timer)) && (
+          {(switchError || (pauseError && timer) || timesheetDeleteError) && (
             <div className="mx-3 mt-1.5 flex items-start gap-2 rounded-md bg-red-50 dark:bg-red-950/30 border border-red-200/60 dark:border-red-800/40 px-2.5 py-2">
               <span className="text-[11px] text-red-600 dark:text-red-400 flex-1 leading-snug">
-                {switchError || pauseError}
+                {switchError || pauseError || timesheetDeleteError}
               </span>
               <button
-                onClick={switchError ? dismissError : dismissPauseError}
+                onClick={switchError ? dismissError : timesheetDeleteError ? dismissDeleteError : dismissPauseError}
                 className="text-red-400 hover:text-red-600 dark:text-red-500 dark:hover:text-red-300 text-xs leading-none shrink-0 p-0.5"
               >
                 ✕
@@ -382,11 +403,16 @@ export default function TrayPopup() {
 
           <div className="flex-1 min-h-0 overflow-y-auto">
             <RecentTasksList
-              tasks={tasks}
+              tasks={visibleTasks}
               onStart={handleStartRecent}
+              onHide={handleHideRecent}
+              onDelete={handleDeleteRecent}
               isLoading={status !== "unconfigured" && tasksLoading}
               startingKey={startingKey}
+              deletingId={deletingId}
               disabled={isStarting || isStopping || isPausing || isResuming}
+              hiddenCount={hiddenCount}
+              onShowAll={clearHidden}
             />
 
             {status !== "unconfigured" && (

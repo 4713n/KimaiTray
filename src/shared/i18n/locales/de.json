@@ -191,6 +191,13 @@
     "resume": "Fortsetzen",
     "pausedSince": "pausiert seit {{time}}"
   },
+  "recentActions": {
+    "hideFromRecents": "Aus Verlauf ausblenden",
+    "deleteFromKimai": "Aus Kimai löschen",
+    "confirmDelete": "Diesen Eintrag löschen?",
+    "hiddenCount": "{{count}} ausgeblendet",
+    "showAll": "Alle anzeigen"
+  },
   "today": {
     "title": "Heute",
     "empty": "Noch keine Zeiteinträge heute",

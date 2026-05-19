@@ -191,6 +191,13 @@
     "resume": "Продовжити",
     "pausedSince": "призупинено о {{time}}"
   },
+  "recentActions": {
+    "hideFromRecents": "Сховати з нещодавніх",
+    "deleteFromKimai": "Видалити з Kimai",
+    "confirmDelete": "Видалити цей запис?",
+    "hiddenCount": "{{count}} сховано",
+    "showAll": "Показати всі"
+  },
   "today": {
     "title": "Сьогодні",
     "empty": "Ще немає записів за сьогодні",

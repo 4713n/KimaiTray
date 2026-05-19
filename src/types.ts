@@ -15,6 +15,7 @@ export interface RecentTask {
   key: string;
   projectId: number;
   activityId: number;
+  timesheetId: number;
   project: string;
   projectColor: string;
   customer: string;

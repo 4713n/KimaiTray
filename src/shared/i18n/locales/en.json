@@ -191,6 +191,13 @@
     "resume": "Resume",
     "pausedSince": "paused at {{time}}"
   },
+  "recentActions": {
+    "hideFromRecents": "Hide from recents",
+    "deleteFromKimai": "Delete from Kimai",
+    "confirmDelete": "Delete this entry?",
+    "hiddenCount": "{{count}} hidden",
+    "showAll": "Show all"
+  },
   "today": {
     "title": "Today",
     "empty": "No time entries today yet",
