@@ -7,6 +7,7 @@ import { getActivities } from "../api/activityApi";
 import type { StartTaskPayload } from "../hooks/useStartTask";
 import TagsInput from "./TagsInput";
 import DateTimePicker from "./DateTimePicker";
+import SearchableSelect from "./SearchableSelect";
 
 interface NewTaskFormProps {
   client: KimaiClient;
@@ -128,69 +129,41 @@ export default function NewTaskForm({
           <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
             {t("newTask.customer")}
           </label>
-          <select
-            value={customerId ?? ""}
-            onChange={(e) =>
-              handleCustomerChange(
-                e.target.value ? Number(e.target.value) : null,
-              )
-            }
+          <SearchableSelect
+            options={customers.map((c) => ({ value: c.id, label: c.name }))}
+            value={customerId}
+            onChange={handleCustomerChange}
+            placeholder={t("newTask.allCustomers")}
             disabled={isSubmitting}
-            className={selectCls}
-          >
-            <option value="">{t("newTask.allCustomers")}</option>
-            {customers.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+            allowEmpty
+            emptyLabel={t("newTask.allCustomers")}
+          />
         </div>
 
         <div>
           <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
             {t("newTask.project")} <span className="text-[var(--accent)]">*</span>
           </label>
-          <select
-            value={projectId ?? ""}
-            onChange={(e) =>
-              handleProjectChange(
-                e.target.value ? Number(e.target.value) : null,
-              )
-            }
+          <SearchableSelect
+            options={filteredProjects.map((p) => ({ value: p.id, label: p.name }))}
+            value={projectId}
+            onChange={handleProjectChange}
+            placeholder={t("newTask.selectProject")}
             disabled={isSubmitting}
-            className={selectCls}
-          >
-            <option value="">{t("newTask.selectProject")}</option>
-            {filteredProjects.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
+          />
         </div>
 
         <div>
           <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
             {t("newTask.activity")} <span className="text-[var(--accent)]">*</span>
           </label>
-          <select
-            value={activityId ?? ""}
-            onChange={(e) =>
-              setActivityId(e.target.value ? Number(e.target.value) : null)
-            }
+          <SearchableSelect
+            options={filteredActivities.map((a) => ({ value: a.id, label: a.name }))}
+            value={activityId}
+            onChange={setActivityId}
+            placeholder={projectId == null ? t("newTask.selectProjectFirst") : t("newTask.selectActivity")}
             disabled={isSubmitting || projectId == null}
-            className={selectCls}
-          >
-            <option value="">
-              {projectId == null ? t("newTask.selectProjectFirst") : t("newTask.selectActivity")}
-            </option>
-            {filteredActivities.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name}
-              </option>
-            ))}
-          </select>
+          />
         </div>
 
         <div>
