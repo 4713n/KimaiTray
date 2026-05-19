@@ -26,7 +26,7 @@ export const defaultSettings: AppSettings = {
   showIdleNotification: true,
 
   theme: "light",
-  useCompactPopup: false,
+  uiSize: "default",
   roundedPopupCorners: true,
   reduceVisualEffects: false,
   accentStyle: "blue",
@@ -59,6 +59,13 @@ export async function loadSettings(): Promise<AppSettings> {
     const raw = await store.get<AppSettings>(SETTINGS_KEY);
     if (!raw) return { ...defaultSettings };
     const settings = { ...defaultSettings, ...raw };
+
+    const rawObj = raw as unknown as Record<string, unknown>;
+    if (rawObj.useCompactPopup !== undefined && !("uiSize" in rawObj)) {
+      settings.uiSize = rawObj.useCompactPopup ? "small" : "default";
+      await store.set(SETTINGS_KEY, settings);
+      await store.save();
+    }
 
     if (settings.kimaiUrl && (!settings.connections || settings.connections.length === 0)) {
       const id = crypto.randomUUID();

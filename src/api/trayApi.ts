@@ -34,6 +34,14 @@ export async function setPopupVibrancy(enabled: boolean): Promise<void> {
   }
 }
 
+export async function setPopupSize(width: number, height: number, zoom: number): Promise<void> {
+  try {
+    await invoke("set_popup_size", { width, height, zoom });
+  } catch {
+    // best-effort
+  }
+}
+
 export async function setPopupCornerRadius(radius: number): Promise<void> {
   try {
     await invoke("set_popup_corner_radius", { radius });

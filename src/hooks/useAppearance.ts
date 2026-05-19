@@ -1,7 +1,16 @@
 import { useEffect } from "react";
 import { loadSettings, onSettingsChange } from "../settings/service";
-import { setPopupCornerRadius, setPopupVibrancy } from "../api/trayApi";
+import { setPopupCornerRadius, setPopupSize, setPopupVibrancy } from "../api/trayApi";
 import type { AppSettings } from "../types";
+
+const POPUP_BASE_WIDTH = 360;
+const POPUP_BASE_HEIGHT = 640;
+
+const UI_SIZE_SCALE: Record<AppSettings["uiSize"], number> = {
+  small: 0.85,
+  default: 1,
+  large: 1.15,
+};
 
 let mediaCleanup: (() => void) | null = null;
 
@@ -19,7 +28,7 @@ function applyThemeClass(theme: AppSettings["theme"]) {
 function apply(s: AppSettings) {
   document.documentElement.dataset.accent = s.accentStyle;
   document.documentElement.dataset.reduceMotion = String(s.reduceVisualEffects);
-  document.documentElement.dataset.compact = String(s.useCompactPopup);
+  document.documentElement.dataset.uiSize = s.uiSize;
   document.documentElement.dataset.roundedPopup = String(s.roundedPopupCorners);
   document.documentElement.dataset.theme = s.theme;
   document.documentElement.dataset.layout = s.popupLayout;
@@ -40,8 +49,15 @@ function apply(s: AppSettings) {
     mediaCleanup = () => mq.removeEventListener("change", handler);
   }
 
+  const scale = UI_SIZE_SCALE[s.uiSize];
+  setPopupSize(
+    Math.round(POPUP_BASE_WIDTH * scale),
+    Math.round(POPUP_BASE_HEIGHT * scale),
+    scale,
+  );
+  setPopupCornerRadius(s.roundedPopupCorners ? 10.0 : 0.0);
+
   if (document.documentElement.dataset.window === "tray-popup") {
-    setPopupCornerRadius(s.roundedPopupCorners ? 10.0 : 0.0);
     setPopupVibrancy(s.theme === "transparent");
   }
 }

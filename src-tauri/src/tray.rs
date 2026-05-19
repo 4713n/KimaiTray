@@ -129,6 +129,17 @@ pub fn set_popup_vibrancy(app: AppHandle, enabled: bool) -> Result<(), String> {
 }
 
 #[tauri::command]
+pub fn set_popup_size(app: AppHandle, width: f64, height: f64, zoom: f64) -> Result<(), String> {
+    let window = app
+        .get_webview_window("tray-popup")
+        .ok_or("Popup not found")?;
+    window
+        .set_size(tauri::Size::Logical(tauri::LogicalSize { width, height }))
+        .map_err(|e| e.to_string())?;
+    window.set_zoom(zoom).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub fn set_popup_corner_radius(app: AppHandle, radius: f64) -> Result<(), String> {
     let window = app
         .get_webview_window("tray-popup")

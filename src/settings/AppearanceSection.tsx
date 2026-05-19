@@ -342,19 +342,64 @@ export default function AppearanceSection({ settings, update }: Props) {
 
       <Divider />
 
-      <FieldGroup label={t("appearanceSettings.roundedCorners")} description={t("appearanceSettings.roundedCornersDescription")} horizontal>
-        <Toggle
-          checked={settings.roundedPopupCorners}
-          onChange={(v) => update("roundedPopupCorners", v)}
-        />
+      <FieldGroup label={t("appearanceSettings.uiSize")} description={t("appearanceSettings.uiSizeDescription")}>
+        <div className="flex gap-2 mt-1">
+          {([
+            { value: "small" as const, label: t("appearanceSettings.uiSizeSmall"), fontSize: "13px" },
+            { value: "default" as const, label: t("appearanceSettings.uiSizeDefault"), fontSize: "16px" },
+            { value: "large" as const, label: t("appearanceSettings.uiSizeLarge"), fontSize: "19px" },
+          ]).map((opt) => {
+            const active = settings.uiSize === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => update("uiSize", opt.value)}
+                className={`flex-1 flex flex-col items-center gap-1.5 rounded-lg border px-2 py-2 transition-colors
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]
+                  ${
+                    active
+                      ? "border-[var(--accent)] bg-[var(--accent-light)]"
+                      : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                  }`}
+              >
+                <div className="w-full h-[48px] rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex items-center justify-center">
+                  <span
+                    className="font-medium text-gray-500 dark:text-gray-400 select-none"
+                    style={{ fontSize: opt.fontSize }}
+                  >
+                    Aa
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span
+                    className={`inline-flex items-center justify-center h-3 w-3 rounded-full border shrink-0
+                      ${
+                        active
+                          ? "border-[var(--accent)]"
+                          : "border-gray-300 dark:border-gray-600"
+                      }`}
+                  >
+                    {active && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+                    )}
+                  </span>
+                  <span className="text-[11px] text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                    {opt.label}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </FieldGroup>
 
       <Divider />
 
-      <FieldGroup label={t("appearanceSettings.compactPopup")} description={t("appearanceSettings.compactPopupDescription")} horizontal>
+      <FieldGroup label={t("appearanceSettings.roundedCorners")} description={t("appearanceSettings.roundedCornersDescription")} horizontal>
         <Toggle
-          checked={settings.useCompactPopup}
-          onChange={(v) => update("useCompactPopup", v)}
+          checked={settings.roundedPopupCorners}
+          onChange={(v) => update("roundedPopupCorners", v)}
         />
       </FieldGroup>
 

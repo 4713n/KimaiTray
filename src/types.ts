@@ -53,7 +53,7 @@ export interface AppSettings {
   showIdleNotification: boolean;
 
   theme: "light" | "dark" | "transparent";
-  useCompactPopup: boolean;
+  uiSize: "small" | "default" | "large";
   roundedPopupCorners: boolean;
   reduceVisualEffects: boolean;
   accentStyle: "blue" | "green" | "purple" | "orange" | "red";
