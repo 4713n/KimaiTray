@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { Divider, SectionTitle } from "./Controls";
 
@@ -52,6 +54,11 @@ function ExternalIcon() {
 
 export default function AboutSection() {
   const { t } = useTranslation();
+  const [appVersion, setAppVersion] = useState("");
+
+  useEffect(() => {
+    getVersion().then(setAppVersion);
+  }, []);
 
   return (
     <div>
@@ -62,7 +69,7 @@ export default function AboutSection() {
           {t("aboutSection.appName")}
         </div>
         <div className="text-[12px] text-gray-500 dark:text-gray-400">
-          {t("aboutSection.version", { version: "0.1.0" })}
+          {appVersion && t("aboutSection.version", { version: appVersion })}
         </div>
         <div className="mt-2 text-[12px] text-gray-400 dark:text-gray-500">
           {t("aboutSection.appDescription")}

@@ -1,5 +1,6 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getVersion } from "@tauri-apps/api/app";
 import type { SettingsSection } from "../types";
 import { useSettings } from "../settings/useSettings";
 import { useAppearance } from "../hooks/useAppearance";
@@ -65,6 +66,11 @@ const NAV_ORDER: SettingsSection[] = [
 export default function Settings() {
   const { t } = useTranslation();
   const [section, setSection] = useState<SettingsSection>("connection");
+  const [appVersion, setAppVersion] = useState("");
+
+  useEffect(() => {
+    getVersion().then(setAppVersion);
+  }, []);
   const {
     settings,
     token,
@@ -124,7 +130,7 @@ export default function Settings() {
         </div>
 
         <div className="px-4 text-[10px] text-gray-300 dark:text-gray-600">
-          v0.1.0
+          {appVersion && `v${appVersion}`}
         </div>
       </nav>
 
