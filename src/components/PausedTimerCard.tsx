@@ -10,6 +10,7 @@ interface PausedTimerCardProps {
   isStopping?: boolean;
   error?: string | null;
   onDismissError?: () => void;
+  compact?: boolean;
 }
 
 function formatPausedAt(iso: string): string {
@@ -27,9 +28,55 @@ export default function PausedTimerCard({
   isStopping,
   error,
   onDismissError,
+  compact,
 }: PausedTimerCardProps) {
   const { t } = useTranslation();
   const busy = !!isResuming || !!isStopping;
+
+  if (compact) {
+    return (
+      <div className="mx-3 mt-1.5 rounded-lg bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40">
+        <div className="px-2.5 py-1.5 flex items-center gap-2">
+          <span
+            className="inline-block h-2 w-2 rounded-full shrink-0"
+            style={{ backgroundColor: paused.projectColor }}
+          />
+          <span className="text-[11px] font-medium text-gray-800 dark:text-gray-200 truncate">
+            {paused.project}
+          </span>
+          <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 shrink-0">
+            {t("pause.paused")}
+          </span>
+          <div className="ml-auto flex items-center gap-1.5 shrink-0">
+            <button
+              onClick={onResume}
+              disabled={busy}
+              title={t("pause.resume")}
+              className="p-1 rounded-md bg-[var(--accent)]/10 text-[var(--accent)] hover:bg-[var(--accent)]/20 disabled:opacity-50 transition-colors focus:outline-none"
+            >
+              {isResuming ? (
+                <div className="h-3 w-3 animate-spin rounded-full border-2 border-[var(--accent)]/30 border-t-[var(--accent)]" />
+              ) : (
+                <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l15 8-15 8V4z" /></svg>
+              )}
+            </button>
+            <button
+              onClick={onStop}
+              disabled={busy}
+              title={t("timer.stopTimer")}
+              className="p-1 rounded-md bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 disabled:opacity-50 transition-colors focus:outline-none"
+            >
+              {isStopping ? (
+                <div className="h-3 w-3 animate-spin rounded-full border-2 border-red-400/30 border-t-red-500" />
+              ) : (
+                <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2" /></svg>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-3 mt-2 rounded-lg bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40">

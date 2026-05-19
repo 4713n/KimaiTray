@@ -22,6 +22,7 @@ function apply(s: AppSettings) {
   document.documentElement.dataset.compact = String(s.useCompactPopup);
   document.documentElement.dataset.roundedPopup = String(s.roundedPopupCorners);
   document.documentElement.dataset.theme = s.theme;
+  document.documentElement.dataset.layout = s.popupLayout;
 
   applyThemeClass(s.theme);
 

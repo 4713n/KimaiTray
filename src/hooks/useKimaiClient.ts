@@ -25,6 +25,8 @@ interface ShortcutSettings {
   shortcutOpenSettings: string;
 }
 
+type PopupLayout = "classic" | "focus" | "taskbar" | "timeline";
+
 interface UseKimaiClientResult {
   client: KimaiClient | null;
   isConfigured: boolean;
@@ -35,6 +37,7 @@ interface UseKimaiClientResult {
   traySettings: TraySettings;
   shortcutSettings: ShortcutSettings;
   autoUpdate: boolean;
+  popupLayout: PopupLayout;
   connections: SavedConnection[];
   activeConnectionId: string;
   switchConnection: (id: string) => void;
@@ -73,6 +76,7 @@ export function useKimaiClient(): UseKimaiClientResult {
   const [traySettings, setTraySettings] =
     useState<TraySettings>(defaultTraySettings);
   const [autoUpdate, setAutoUpdate] = useState(true);
+  const [popupLayout, setPopupLayout] = useState<PopupLayout>("classic");
   const [shortcutSettings, setShortcutSettings] =
     useState<ShortcutSettings>(defaultShortcutSettings);
 
@@ -108,6 +112,7 @@ export function useKimaiClient(): UseKimaiClientResult {
       shortcutOpenSettings: s.shortcutOpenSettings,
     });
     setAutoUpdate(s.autoUpdate);
+    setPopupLayout(s.popupLayout ?? "classic");
     if (s.kimaiUrl) {
       try {
         const t = await getApiToken(s.kimaiUrl);
@@ -184,6 +189,7 @@ export function useKimaiClient(): UseKimaiClientResult {
     traySettings,
     shortcutSettings,
     autoUpdate,
+    popupLayout,
     connections,
     activeConnectionId,
     switchConnection,

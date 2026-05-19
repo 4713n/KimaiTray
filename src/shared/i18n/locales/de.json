@@ -169,7 +169,17 @@
     "reduceEffects": "Visuelle Effekte reduzieren",
     "reduceEffectsDescription": "Animationen und Transparenz deaktivieren",
     "accentColor": "Akzentfarbe",
-    "accentColorDescription": "Wird für aktive Zustände und primäre Aktionen verwendet"
+    "accentColorDescription": "Wird für aktive Zustände und primäre Aktionen verwendet",
+    "popupLayout": "Popup-Layout",
+    "popupLayoutDescription": "Wählen Sie die Anordnung der Bereiche im Tray-Popup",
+    "layoutClassic": "Klassisch",
+    "layoutClassicDescription": "Timer, letzte Aufgaben und Tagesübersicht",
+    "layoutFocus": "Fokus",
+    "layoutFocusDescription": "Großer Timer mit Tabs darunter",
+    "layoutTaskbar": "Taskleiste",
+    "layoutTaskbarDescription": "Schnelles Aufgabenwechseln, kompakter Timer",
+    "layoutTimeline": "Zeitachse",
+    "layoutTimelineDescription": "Tagesübersicht zuerst, Aufgaben eingeklappt"
   },
   "aboutSection": {
     "title": "Über",

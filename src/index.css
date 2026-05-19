@@ -48,6 +48,14 @@
   padding-bottom: 0.25rem;
 }
 
+/* ── Focus layout: enlarged timer area ──────────────────────── */
+[data-layout="focus"][data-window="tray-popup"] .timer-area {
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 html, body, #root {
   margin: 0;
   padding: 0;

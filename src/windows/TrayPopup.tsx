@@ -36,6 +36,9 @@ export default function TrayPopup() {
   const qc = useQueryClient();
   const [showNewTask, setShowNewTask] = useState(false);
   const [idleProcessing, setIdleProcessing] = useState(false);
+  const [focusTab, setFocusTab] = useState<"recent" | "today">("recent");
+  const [recentCollapsed, setRecentCollapsed] = useState(false);
+  const [todayCollapsed, setTodayCollapsed] = useState(false);
 
   useAppearance();
   useLanguageSync();
@@ -60,11 +63,17 @@ export default function TrayPopup() {
     traySettings,
     shortcutSettings,
     autoUpdate,
+    popupLayout,
     connections,
     activeConnectionId,
     switchConnection,
   } = useKimaiClient();
   const updater = useUpdater(autoUpdate);
+
+  useEffect(() => {
+    setRecentCollapsed(popupLayout === "timeline");
+    setTodayCollapsed(popupLayout === "taskbar");
+  }, [popupLayout]);
 
   useEffect(() => {
     const shortcutHint = shortcutSettings.shortcutTogglePopup
@@ -350,6 +359,8 @@ export default function TrayPopup() {
     startTask(payload);
   };
 
+  const compactTimer = popupLayout === "taskbar" || popupLayout === "timeline";
+
   const showIdleDialog =
     idleState === "returned" &&
     idleSettings.idleAction === "ask" &&
@@ -393,35 +404,41 @@ export default function TrayPopup() {
         />
       ) : (
         <>
-          {status === "loading" ? (
-            <EmptyTimerState variant="loading" />
-          ) : status === "unconfigured" ? (
-            <EmptyTimerState variant="unconfigured" />
-          ) : timer ? (
-            <ActiveTimerCard
-              timer={timer}
-              onStop={fullStop}
-              onPause={pauseTimer}
-              isStopping={isStopping}
-              isPausing={isPausing}
-              multipleActive={multipleActive}
-              onEdit={editTimer}
-              isSaving={isSaving}
-              saveError={saveError}
-            />
-          ) : isPaused && pausedTimer ? (
-            <PausedTimerCard
-              paused={pausedTimer}
-              onResume={resumeTimer}
-              onStop={fullStop}
-              isResuming={isResuming}
-              isStopping={isStopping}
-              error={pauseError}
-              onDismissError={dismissPauseError}
-            />
-          ) : (
-            <EmptyTimerState />
-          )}
+          {/* Timer area */}
+          <div className={popupLayout === "focus" ? "timer-area" : undefined}>
+            {status === "loading" ? (
+              <EmptyTimerState variant="loading" compact={compactTimer} />
+            ) : status === "unconfigured" ? (
+              <EmptyTimerState variant="unconfigured" compact={compactTimer} />
+            ) : timer ? (
+              <ActiveTimerCard
+                timer={timer}
+                onStop={fullStop}
+                onPause={pauseTimer}
+                isStopping={isStopping}
+                isPausing={isPausing}
+                multipleActive={multipleActive}
+                onEdit={editTimer}
+                isSaving={isSaving}
+                saveError={saveError}
+                compact={compactTimer}
+                focusMode={popupLayout === "focus"}
+              />
+            ) : isPaused && pausedTimer ? (
+              <PausedTimerCard
+                paused={pausedTimer}
+                onResume={resumeTimer}
+                onStop={fullStop}
+                isResuming={isResuming}
+                isStopping={isStopping}
+                error={pauseError}
+                onDismissError={dismissPauseError}
+                compact={compactTimer}
+              />
+            ) : (
+              <EmptyTimerState compact={compactTimer} />
+            )}
+          </div>
 
           {(switchError || (pauseError && timer) || timesheetDeleteError) && (
             <div className="mx-3 mt-1.5 flex items-start gap-2 rounded-md bg-red-50 dark:bg-red-950/30 border border-red-200/60 dark:border-red-800/40 px-2.5 py-2">
@@ -439,36 +456,207 @@ export default function TrayPopup() {
 
           <div className="mx-3 mt-2 border-t border-gray-100 dark:border-gray-800" />
 
+          {/* Scrollable content — layout-dependent */}
           <div className="flex-1 min-h-0 overflow-y-auto">
-            <RecentTasksList
-              tasks={visibleTasks}
-              onStart={handleStartRecent}
-              onHide={handleHideRecent}
-              onDelete={handleDeleteRecent}
-              isLoading={status !== "unconfigured" && tasksLoading}
-              startingKey={startingKey}
-              deletingId={deletingId}
-              disabled={isStarting || isStopping || isPausing || isResuming}
-              hiddenCount={hiddenCount}
-              onShowAll={clearHidden}
-            />
-
-            {status !== "unconfigured" && (
+            {popupLayout === "focus" ? (
               <>
-                <div className="mx-3 border-t border-gray-100 dark:border-gray-800" />
-                <TodaySection
-                  entries={today.entries}
-                  totalCount={today.totalCount}
-                  totalDuration={today.totalDuration}
-                  hasMore={today.hasMore}
-                  expanded={today.expanded}
-                  onToggleExpand={() => today.setExpanded(!today.expanded)}
-                  sortAsc={today.sortAsc}
-                  onToggleSort={() => today.setSortAsc(!today.sortAsc)}
-                  isLoading={today.isLoading}
-                  isError={today.isError}
-                  onRetry={() => today.refetch()}
+                {/* Tab bar */}
+                <div className="mx-3 mt-1.5 mb-1 flex gap-1">
+                  <button
+                    onClick={() => setFocusTab("recent")}
+                    className={`flex-1 rounded-md px-2 py-1 text-[10px] font-medium transition-colors focus:outline-none ${
+                      focusTab === "recent"
+                        ? "bg-[var(--accent)]/10 text-[var(--accent)]"
+                        : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                    }`}
+                  >
+                    {t("tray.recentTasks")}
+                  </button>
+                  <button
+                    onClick={() => setFocusTab("today")}
+                    className={`flex-1 rounded-md px-2 py-1 text-[10px] font-medium transition-colors focus:outline-none ${
+                      focusTab === "today"
+                        ? "bg-[var(--accent)]/10 text-[var(--accent)]"
+                        : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                    }`}
+                  >
+                    {t("today.title")}
+                  </button>
+                </div>
+                {focusTab === "recent" ? (
+                  <RecentTasksList
+                    tasks={visibleTasks}
+                    onStart={handleStartRecent}
+                    onHide={handleHideRecent}
+                    onDelete={handleDeleteRecent}
+                    isLoading={status !== "unconfigured" && tasksLoading}
+                    startingKey={startingKey}
+                    deletingId={deletingId}
+                    disabled={isStarting || isStopping || isPausing || isResuming}
+                    hiddenCount={hiddenCount}
+                    onShowAll={clearHidden}
+                  />
+                ) : status !== "unconfigured" ? (
+                  <TodaySection
+                    entries={today.entries}
+                    totalCount={today.totalCount}
+                    totalDuration={today.totalDuration}
+                    hasMore={today.hasMore}
+                    expanded={today.expanded}
+                    onToggleExpand={() => today.setExpanded(!today.expanded)}
+                    sortAsc={today.sortAsc}
+                    onToggleSort={() => today.setSortAsc(!today.sortAsc)}
+                    isLoading={today.isLoading}
+                    isError={today.isError}
+                    onRetry={() => today.refetch()}
+                  />
+                ) : null}
+              </>
+            ) : popupLayout === "timeline" ? (
+              <>
+                {/* Today first */}
+                {status !== "unconfigured" && (
+                  <>
+                    <TodaySection
+                      entries={today.entries}
+                      totalCount={today.totalCount}
+                      totalDuration={today.totalDuration}
+                      hasMore={today.hasMore}
+                      expanded={today.expanded}
+                      onToggleExpand={() => today.setExpanded(!today.expanded)}
+                      sortAsc={today.sortAsc}
+                      onToggleSort={() => today.setSortAsc(!today.sortAsc)}
+                      isLoading={today.isLoading}
+                      isError={today.isError}
+                      onRetry={() => today.refetch()}
+                    />
+                    <div className="mx-3 border-t border-gray-100 dark:border-gray-800" />
+                  </>
+                )}
+                {/* Collapsible recent tasks */}
+                <div className="mt-1.5">
+                  <button
+                    onClick={() => setRecentCollapsed(!recentCollapsed)}
+                    className="w-full px-3 py-1.5 flex items-center justify-between"
+                  >
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                      {t("tray.recentTasks")}
+                    </span>
+                    <svg
+                      className={`h-3 w-3 text-gray-400 dark:text-gray-500 transition-transform ${recentCollapsed ? "" : "rotate-180"}`}
+                      fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {!recentCollapsed && (
+                    <RecentTasksList
+                      tasks={visibleTasks}
+                      onStart={handleStartRecent}
+                      onHide={handleHideRecent}
+                      onDelete={handleDeleteRecent}
+                      isLoading={status !== "unconfigured" && tasksLoading}
+                      startingKey={startingKey}
+                      deletingId={deletingId}
+                      disabled={isStarting || isStopping || isPausing || isResuming}
+                      hiddenCount={hiddenCount}
+                      onShowAll={clearHidden}
+                    />
+                  )}
+                </div>
+              </>
+            ) : popupLayout === "taskbar" ? (
+              <>
+                <RecentTasksList
+                  tasks={visibleTasks}
+                  onStart={handleStartRecent}
+                  onHide={handleHideRecent}
+                  onDelete={handleDeleteRecent}
+                  isLoading={status !== "unconfigured" && tasksLoading}
+                  startingKey={startingKey}
+                  deletingId={deletingId}
+                  disabled={isStarting || isStopping || isPausing || isResuming}
+                  hiddenCount={hiddenCount}
+                  onShowAll={clearHidden}
                 />
+                {status !== "unconfigured" && (
+                  <>
+                    <div className="mx-3 border-t border-gray-100 dark:border-gray-800" />
+                    {/* Collapsible today section */}
+                    <div className="mt-1.5">
+                      <button
+                        onClick={() => setTodayCollapsed(!todayCollapsed)}
+                        className="w-full px-3 py-1.5 flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                            {t("today.title")}
+                          </span>
+                          {today.totalCount > 0 && (
+                            <span className="text-[10px] tabular-nums text-gray-400 dark:text-gray-500">
+                              {today.totalDuration > 0 && `${Math.floor(today.totalDuration / 3600)}h ${Math.floor((today.totalDuration % 3600) / 60)}m`}
+                            </span>
+                          )}
+                        </div>
+                        <svg
+                          className={`h-3 w-3 text-gray-400 dark:text-gray-500 transition-transform ${todayCollapsed ? "" : "rotate-180"}`}
+                          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      {!todayCollapsed && (
+                        <TodaySection
+                          entries={today.entries}
+                          totalCount={today.totalCount}
+                          totalDuration={today.totalDuration}
+                          hasMore={today.hasMore}
+                          expanded={today.expanded}
+                          onToggleExpand={() => today.setExpanded(!today.expanded)}
+                          sortAsc={today.sortAsc}
+                          onToggleSort={() => today.setSortAsc(!today.sortAsc)}
+                          isLoading={today.isLoading}
+                          isError={today.isError}
+                          onRetry={() => today.refetch()}
+                        />
+                      )}
+                    </div>
+                  </>
+                )}
+              </>
+            ) : (
+              /* Classic layout */
+              <>
+                <RecentTasksList
+                  tasks={visibleTasks}
+                  onStart={handleStartRecent}
+                  onHide={handleHideRecent}
+                  onDelete={handleDeleteRecent}
+                  isLoading={status !== "unconfigured" && tasksLoading}
+                  startingKey={startingKey}
+                  deletingId={deletingId}
+                  disabled={isStarting || isStopping || isPausing || isResuming}
+                  hiddenCount={hiddenCount}
+                  onShowAll={clearHidden}
+                />
+                {status !== "unconfigured" && (
+                  <>
+                    <div className="mx-3 border-t border-gray-100 dark:border-gray-800" />
+                    <TodaySection
+                      entries={today.entries}
+                      totalCount={today.totalCount}
+                      totalDuration={today.totalDuration}
+                      hasMore={today.hasMore}
+                      expanded={today.expanded}
+                      onToggleExpand={() => today.setExpanded(!today.expanded)}
+                      sortAsc={today.sortAsc}
+                      onToggleSort={() => today.setSortAsc(!today.sortAsc)}
+                      isLoading={today.isLoading}
+                      isError={today.isError}
+                      onRetry={() => today.refetch()}
+                    />
+                  </>
+                )}
               </>
             )}
           </div>

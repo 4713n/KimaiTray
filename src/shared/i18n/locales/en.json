@@ -142,7 +142,17 @@
     "reduceEffects": "Reduce visual effects",
     "reduceEffectsDescription": "Disable animations and translucency",
     "accentColor": "Accent color",
-    "accentColorDescription": "Used for active states and primary actions"
+    "accentColorDescription": "Used for active states and primary actions",
+    "popupLayout": "Popup layout",
+    "popupLayoutDescription": "Choose how sections are arranged in the tray popup",
+    "layoutClassic": "Classic",
+    "layoutClassicDescription": "Timer, recent tasks, and today's log",
+    "layoutFocus": "Focus",
+    "layoutFocusDescription": "Large timer with tabbed content below",
+    "layoutTaskbar": "Taskbar",
+    "layoutTaskbarDescription": "Quick task switching, compact timer",
+    "layoutTimeline": "Timeline",
+    "layoutTimelineDescription": "Today's log first, tasks collapsed"
   },
   "shortcuts": {
     "title": "Shortcuts",

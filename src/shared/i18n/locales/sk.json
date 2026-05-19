@@ -169,7 +169,17 @@
     "reduceEffects": "Znížiť vizuálne efekty",
     "reduceEffectsDescription": "Vypnúť animácie a priehľadnosť",
     "accentColor": "Farba zvýraznenia",
-    "accentColorDescription": "Používa sa pre aktívne stavy a primárne akcie"
+    "accentColorDescription": "Používa sa pre aktívne stavy a primárne akcie",
+    "popupLayout": "Rozloženie popup okna",
+    "popupLayoutDescription": "Vyberte usporiadanie sekcií v tray popup okne",
+    "layoutClassic": "Klasické",
+    "layoutClassicDescription": "Časovač, nedávne úlohy a dnešný prehľad",
+    "layoutFocus": "Fokus",
+    "layoutFocusDescription": "Veľký časovač s kartami obsahu nižšie",
+    "layoutTaskbar": "Panel úloh",
+    "layoutTaskbarDescription": "Rýchle prepínanie úloh, kompaktný časovač",
+    "layoutTimeline": "Časová os",
+    "layoutTimelineDescription": "Dnešný prehľad prvý, úlohy zbalené"
   },
   "aboutSection": {
     "title": "O aplikácii",

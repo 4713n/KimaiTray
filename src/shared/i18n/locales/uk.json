@@ -169,7 +169,17 @@
     "reduceEffects": "Зменшити візуальні ефекти",
     "reduceEffectsDescription": "Вимкнути анімації та прозорість",
     "accentColor": "Колір акценту",
-    "accentColorDescription": "Використовується для активних станів та основних дій"
+    "accentColorDescription": "Використовується для активних станів та основних дій",
+    "popupLayout": "Макет popup вікна",
+    "popupLayoutDescription": "Виберіть розташування секцій у tray popup вікні",
+    "layoutClassic": "Класичний",
+    "layoutClassicDescription": "Таймер, нещодавні завдання та огляд дня",
+    "layoutFocus": "Фокус",
+    "layoutFocusDescription": "Великий таймер із вкладками нижче",
+    "layoutTaskbar": "Панель завдань",
+    "layoutTaskbarDescription": "Швидке перемикання завдань, компактний таймер",
+    "layoutTimeline": "Хронологія",
+    "layoutTimelineDescription": "Огляд дня першим, завдання згорнуті"
   },
   "aboutSection": {
     "title": "Про застосунок",

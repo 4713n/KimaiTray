@@ -57,6 +57,7 @@ export interface AppSettings {
   roundedPopupCorners: boolean;
   reduceVisualEffects: boolean;
   accentStyle: "blue" | "green" | "purple" | "orange" | "red";
+  popupLayout: "classic" | "focus" | "taskbar" | "timeline";
 
   shortcutTogglePopup: string;
   shortcutStartStopTimer: string;

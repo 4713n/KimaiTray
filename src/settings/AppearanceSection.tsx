@@ -21,8 +21,188 @@ const accentOptions: { value: AppSettings["accentStyle"]; color: string }[] = [
   { value: "red", color: "#ef4444" },
 ];
 
+function LayoutPreview({ layout }: { layout: AppSettings["popupLayout"] }) {
+  const line = "h-[2px] rounded-full";
+  const row = "h-[3px] rounded-full";
+  const divider = "h-[1px] w-full bg-gray-200 dark:bg-gray-700";
+  const sectionLabel = "h-[2px] w-6 rounded-full bg-gray-400/60 dark:bg-gray-500/60";
+  const taskRow = `${row} bg-gray-200 dark:bg-gray-700`;
+  const todayRow = "h-[3px] rounded-full bg-gray-200 dark:bg-gray-700";
+  const footer = `${line} w-full bg-gray-400 dark:bg-gray-500`;
+  const header = `${line} w-full bg-gray-400 dark:bg-gray-500`;
+  const wrap = "w-full h-[72px] rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-1.5 flex flex-col";
+
+  if (layout === "classic") {
+    return (
+      <div className={wrap}>
+        {/* Header */}
+        <div className={header} />
+        {/* Timer card */}
+        <div className="mx-0.5 mt-1 rounded border border-emerald-300/50 dark:border-emerald-700/50 bg-emerald-50 dark:bg-emerald-950/30 px-1 py-1 flex flex-col gap-[2px]">
+          <div className="flex items-center gap-1">
+            <span className="h-[3px] w-[3px] rounded-full bg-emerald-400 shrink-0" />
+            <div className={`${line} w-8 bg-gray-400 dark:bg-gray-500`} />
+            <div className={`${line} w-4 bg-gray-300 dark:bg-gray-600`} />
+          </div>
+          <div className={`${line} w-10 bg-emerald-400 dark:bg-emerald-500 ml-1.5`} />
+        </div>
+        {/* Divider */}
+        <div className={`${divider} mt-1`} />
+        {/* Recent tasks section */}
+        <div className="flex-1 mt-0.5 flex flex-col gap-[2px] overflow-hidden">
+          <div className={sectionLabel} />
+          <div className={`${taskRow} w-full`} />
+          <div className={`${taskRow} w-4/5`} />
+          <div className={`${taskRow} w-full`} />
+        </div>
+        {/* Divider */}
+        <div className={divider} />
+        {/* Today section */}
+        <div className="mt-0.5 flex flex-col gap-[2px]">
+          <div className={sectionLabel} />
+          <div className="flex gap-0.5">
+            <div className={`${todayRow} w-3`} />
+            <div className={`${todayRow} flex-1`} />
+          </div>
+        </div>
+        {/* Footer */}
+        <div className={`${footer} mt-auto`} />
+      </div>
+    );
+  }
+
+  if (layout === "focus") {
+    return (
+      <div className={wrap}>
+        {/* Header */}
+        <div className={header} />
+        {/* Large timer card */}
+        <div className="mx-0.5 mt-1 flex-[2] rounded border border-emerald-300/50 dark:border-emerald-700/50 bg-emerald-50 dark:bg-emerald-950/30 flex flex-col items-center justify-center gap-[3px] min-h-0">
+          <div className="flex items-center gap-1">
+            <span className="h-[3px] w-[3px] rounded-full bg-emerald-400 shrink-0" />
+            <div className={`${line} w-8 bg-gray-400 dark:bg-gray-500`} />
+          </div>
+          <div className="h-[5px] w-10 rounded-full bg-emerald-400 dark:bg-emerald-500" />
+        </div>
+        {/* Divider */}
+        <div className={`${divider} mt-1`} />
+        {/* Tab bar */}
+        <div className="flex gap-0.5 mt-0.5 justify-center">
+          <div className="h-[3px] w-7 rounded-full bg-[var(--accent)]/50" />
+          <div className={`h-[3px] w-7 rounded-full bg-gray-200 dark:bg-gray-700`} />
+        </div>
+        {/* Tab content */}
+        <div className="flex-1 mt-0.5 flex flex-col gap-[2px] overflow-hidden">
+          <div className={`${taskRow} w-full`} />
+          <div className={`${taskRow} w-4/5`} />
+          <div className={`${taskRow} w-full`} />
+        </div>
+        {/* Footer */}
+        <div className={`${footer} mt-auto`} />
+      </div>
+    );
+  }
+
+  if (layout === "taskbar") {
+    return (
+      <div className={wrap}>
+        {/* Header */}
+        <div className={header} />
+        {/* Compact timer bar */}
+        <div className="mx-0.5 mt-0.5 rounded border border-emerald-300/50 dark:border-emerald-700/50 bg-emerald-50 dark:bg-emerald-950/30 px-1 py-0.5 flex items-center gap-1">
+          <span className="h-[3px] w-[3px] rounded-full bg-emerald-400 shrink-0" />
+          <div className={`${line} w-5 bg-gray-400 dark:bg-gray-500`} />
+          <div className={`${line} w-4 bg-emerald-400 dark:bg-emerald-500 ml-auto`} />
+        </div>
+        {/* Divider */}
+        <div className={`${divider} mt-0.5`} />
+        {/* Recent tasks — large area */}
+        <div className="flex-1 mt-0.5 flex flex-col gap-[2px] overflow-hidden">
+          <div className={sectionLabel} />
+          <div className={`${taskRow} w-full`} />
+          <div className={`${taskRow} w-4/5`} />
+          <div className={`${taskRow} w-full`} />
+          <div className={`${taskRow} w-3/4`} />
+          <div className={`${taskRow} w-full`} />
+        </div>
+        {/* Divider */}
+        <div className={divider} />
+        {/* Collapsed today header with chevron */}
+        <div className="mt-0.5 flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <div className={sectionLabel} />
+            <div className={`${line} w-4 bg-gray-300 dark:bg-gray-600`} />
+          </div>
+          <svg className="h-[5px] w-[5px] text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        {/* Footer */}
+        <div className={`${footer} mt-auto`} />
+      </div>
+    );
+  }
+
+  // Timeline
+  return (
+    <div className={wrap}>
+      {/* Header */}
+      <div className={header} />
+      {/* Compact timer bar */}
+      <div className="mx-0.5 mt-0.5 rounded border border-emerald-300/50 dark:border-emerald-700/50 bg-emerald-50 dark:bg-emerald-950/30 px-1 py-0.5 flex items-center gap-1">
+        <span className="h-[3px] w-[3px] rounded-full bg-emerald-400 shrink-0" />
+        <div className={`${line} w-5 bg-gray-400 dark:bg-gray-500`} />
+        <div className={`${line} w-4 bg-emerald-400 dark:bg-emerald-500 ml-auto`} />
+      </div>
+      {/* Divider */}
+      <div className={`${divider} mt-0.5`} />
+      {/* Today section — large area */}
+      <div className="flex-1 mt-0.5 flex flex-col gap-[2px] overflow-hidden">
+        <div className={sectionLabel} />
+        <div className="flex gap-0.5">
+          <div className={`${todayRow} w-3`} />
+          <div className={`${todayRow} flex-1`} />
+        </div>
+        <div className="flex gap-0.5">
+          <div className={`${todayRow} w-3`} />
+          <div className={`${todayRow} flex-1`} />
+        </div>
+        <div className="flex gap-0.5">
+          <div className={`${todayRow} w-3`} />
+          <div className={`${todayRow} flex-1`} />
+        </div>
+        <div className="flex gap-0.5">
+          <div className={`${todayRow} w-3`} />
+          <div className={`${todayRow} flex-1`} />
+        </div>
+      </div>
+      {/* Divider */}
+      <div className={divider} />
+      {/* Collapsed recent tasks header with chevron */}
+      <div className="mt-0.5 flex items-center justify-between">
+        <div className={sectionLabel} />
+        <svg className="h-[5px] w-[5px] text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+      {/* Footer */}
+      <div className={`${footer} mt-auto`} />
+    </div>
+  );
+}
+
 export default function AppearanceSection({ settings, update }: Props) {
   const { t } = useTranslation();
+
+  const layoutOptions: {
+    value: AppSettings["popupLayout"];
+    label: string;
+  }[] = [
+    { value: "classic", label: t("appearanceSettings.layoutClassic") },
+    { value: "focus", label: t("appearanceSettings.layoutFocus") },
+    { value: "taskbar", label: t("appearanceSettings.layoutTaskbar") },
+    { value: "timeline", label: t("appearanceSettings.layoutTimeline") },
+  ];
 
   const themeOptions: {
     value: AppSettings["theme"];
@@ -96,6 +276,67 @@ export default function AppearanceSection({ settings, update }: Props) {
               </button>
             );
           })}
+        </div>
+      </FieldGroup>
+
+      <Divider />
+
+      <FieldGroup label={t("appearanceSettings.popupLayout")} description={t("appearanceSettings.popupLayoutDescription")}>
+        <div className="relative mt-1">
+          {/* Fade hint on the right edge */}
+          <div className="pointer-events-none absolute right-0 top-0 bottom-1 w-6 z-10 bg-gradient-to-l from-white dark:from-gray-900 to-transparent rounded-r-lg" />
+          <div className="-mx-1 px-1 flex gap-2 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden">
+            {layoutOptions.map((opt) => {
+              const active = settings.popupLayout === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => update("popupLayout", opt.value)}
+                  className={`snap-start shrink-0 flex flex-col items-center gap-1.5 rounded-lg border px-2 py-2 transition-colors
+                    focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]
+                    ${
+                      active
+                        ? "border-[var(--accent)] bg-[var(--accent-light)]"
+                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                    }`}
+                  style={{ width: "calc((100% - 1rem) / 3)" }}
+                >
+                  <LayoutPreview layout={opt.value} />
+                  <div className="flex items-center gap-1">
+                    <span
+                      className={`inline-flex items-center justify-center h-3 w-3 rounded-full border shrink-0
+                        ${
+                          active
+                            ? "border-[var(--accent)]"
+                            : "border-gray-300 dark:border-gray-600"
+                        }`}
+                    >
+                      {active && (
+                        <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+                      )}
+                    </span>
+                    <span className="text-[11px] text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                      {opt.label}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          {/* Dot indicators */}
+          <div className="flex justify-center gap-1 mt-1.5">
+            {layoutOptions.map((opt) => (
+              <span
+                key={opt.value}
+                className={`h-1 rounded-full transition-all ${
+                  settings.popupLayout === opt.value
+                    ? "w-3 bg-[var(--accent)]"
+                    : "w-1 bg-gray-300 dark:bg-gray-600"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </FieldGroup>
 

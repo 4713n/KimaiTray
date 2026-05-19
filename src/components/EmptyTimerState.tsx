@@ -2,12 +2,43 @@ import { useTranslation } from "react-i18next";
 
 interface EmptyTimerStateProps {
   variant?: "empty" | "loading" | "unconfigured";
+  compact?: boolean;
 }
 
 export default function EmptyTimerState({
   variant = "empty",
+  compact,
 }: EmptyTimerStateProps) {
   const { t } = useTranslation();
+
+  if (compact) {
+    return (
+      <div className="mx-3 mt-1.5 rounded-lg border border-dashed border-gray-200 dark:border-gray-700 px-2.5 py-1.5">
+        <div className="flex items-center gap-2">
+          {variant === "loading" ? (
+            <>
+              <div className="h-3 w-3 animate-spin rounded-full border-2 border-gray-200 dark:border-gray-600 shrink-0" style={{ borderTopColor: "var(--accent)" }} />
+              <span className="text-[11px] text-gray-400 dark:text-gray-500">{t("common.loading")}</span>
+            </>
+          ) : variant === "unconfigured" ? (
+            <>
+              <svg className="h-3 w-3 text-gray-300 dark:text-gray-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.06a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364L4.34 8.798" />
+              </svg>
+              <span className="text-[11px] text-gray-400 dark:text-gray-500">{t("tray.notConnected")}</span>
+            </>
+          ) : (
+            <>
+              <svg className="h-3 w-3 text-gray-300 dark:text-gray-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
+              </svg>
+              <span className="text-[11px] text-gray-400 dark:text-gray-500">{t("tray.noActiveTimer")}</span>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   if (variant === "loading") {
     return (

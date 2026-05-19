@@ -30,6 +30,7 @@ export const defaultSettings: AppSettings = {
   roundedPopupCorners: true,
   reduceVisualEffects: false,
   accentStyle: "blue",
+  popupLayout: "classic",
 
   shortcutTogglePopup: "",
   shortcutStartStopTimer: "",

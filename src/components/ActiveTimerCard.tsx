@@ -18,6 +18,8 @@ interface ActiveTimerCardProps {
   ) => void;
   isSaving?: boolean;
   saveError?: string | null;
+  compact?: boolean;
+  focusMode?: boolean;
 }
 
 function formatElapsed(seconds: number, showSeconds = true): string {
@@ -52,6 +54,8 @@ export default function ActiveTimerCard({
   onEdit,
   isSaving,
   saveError,
+  compact,
+  focusMode,
 }: ActiveTimerCardProps) {
   const { t } = useTranslation();
   const [elapsed, setElapsed] = useState(() =>
@@ -165,6 +169,54 @@ export default function ActiveTimerCard({
     setBeginError("");
   }, [timer.id]);
 
+  if (compact) {
+    return (
+      <div className="mx-3 mt-1.5 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40">
+        <div className="px-2.5 py-1.5 flex items-center gap-2">
+          <span
+            className="inline-block h-2 w-2 rounded-full shrink-0 animate-pulse"
+            style={{ backgroundColor: timer.projectColor }}
+          />
+          <span className="text-[11px] font-medium text-gray-800 dark:text-gray-200 truncate">
+            {timer.project}
+          </span>
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 truncate">
+            {timer.activity}
+          </span>
+          <span className="ml-auto text-[13px] font-mono font-semibold tabular-nums text-emerald-700 dark:text-emerald-400 tracking-tight shrink-0">
+            {formatElapsed(elapsed)}
+          </span>
+          {onPause && (
+            <button
+              onClick={onPause}
+              disabled={!!isPausing || !!isStopping}
+              title={t("pause.pause")}
+              className="p-1 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 disabled:opacity-50 transition-colors focus:outline-none"
+            >
+              {isPausing ? (
+                <div className="h-3 w-3 animate-spin rounded-full border-2 border-amber-400/30 border-t-amber-500" />
+              ) : (
+                <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="4" width="5" height="16" rx="1" /><rect x="14" y="4" width="5" height="16" rx="1" /></svg>
+              )}
+            </button>
+          )}
+          <button
+            onClick={onStop}
+            disabled={!!isStopping || !!isPausing}
+            title={t("timer.stopTimer")}
+            className="p-1 rounded-md bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 disabled:opacity-50 transition-colors focus:outline-none"
+          >
+            {isStopping ? (
+              <div className="h-3 w-3 animate-spin rounded-full border-2 border-red-400/30 border-t-red-500" />
+            ) : (
+              <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2" /></svg>
+            )}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-3 mt-2 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40">
       <div className="px-3 py-2.5">
@@ -257,7 +309,7 @@ export default function ActiveTimerCard({
         {/* Row 4: Elapsed + start time + stop */}
         <div className="flex items-center justify-between pl-4">
           <div className="flex items-baseline gap-2 min-w-0">
-            <span className="text-lg font-mono font-semibold tabular-nums text-emerald-700 dark:text-emerald-400 tracking-tight shrink-0">
+            <span className={`${focusMode ? "text-2xl" : "text-lg"} font-mono font-semibold tabular-nums text-emerald-700 dark:text-emerald-400 tracking-tight shrink-0`}>
               {formatElapsed(elapsed)}
             </span>
             {editingBegin ? (
