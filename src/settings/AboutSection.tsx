@@ -79,9 +79,8 @@ export default function AboutSection() {
       <div className="space-y-0.5">
         <LinkButton
           label={t("aboutSection.githubRepo")}
-          href="https://github.com/engazan/kimaimate"
+          href="https://github.com/Engazan/KimaiTray"
           icon={<ExternalIcon />}
-          disabled
         />
         <LinkButton
           label={t("aboutSection.website")}
@@ -91,9 +90,8 @@ export default function AboutSection() {
         />
         <LinkButton
           label={t("aboutSection.reportIssue")}
-          href="https://github.com/engazan/kimaimate/issues"
+          href="https://github.com/Engazan/KimaiTray/issues"
           icon={<ExternalIcon />}
-          disabled
         />
         <LinkButton
           label={t("aboutSection.privacyPolicy")}
