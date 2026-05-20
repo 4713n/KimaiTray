@@ -1,3 +1,7 @@
+import type { IssueIntegrationSettings } from "./integrations/issues/types";
+
+export type { IssueIntegrationSettings };
+
 export interface ActiveTimer {
   id: number;
   projectId: number;
@@ -74,6 +78,8 @@ export interface AppSettings {
   displayMode: "tray" | "detached";
 
   autoUpdate: boolean;
+
+  issueIntegrations: Record<string, IssueIntegrationSettings>;
 }
 
 export interface TodayEntry {
@@ -99,6 +105,7 @@ export type SettingsSection =
   | "appearance"
   | "tray"
   | "features"
+  | "integrations"
   | "idle"
   | "shortcuts"
   | "about";

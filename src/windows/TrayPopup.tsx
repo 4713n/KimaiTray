@@ -31,6 +31,9 @@ import { useUpdater } from "../hooks/useUpdater";
 import { updateTimesheet, stopTimesheet } from "../api/timesheetApi";
 import { formatElapsed } from "../components/ActiveTimerCard";
 import type { RecentTask } from "../types";
+import type { ExternalIssue } from "../integrations/issues/types";
+import { createIssueProvider } from "../integrations/issues/issueProvider";
+import { logger } from "../utils/logger";
 
 const isMac = navigator.platform.toUpperCase().includes("MAC");
 
@@ -187,6 +190,8 @@ export default function TrayPopup() {
     connections,
     activeConnectionId,
     switchConnection,
+    issueIntegration,
+    issueToken,
   } = useKimaiClient();
   const isDetached = displayMode === "detached";
   const [pinned, setPinned] = useState(false);
@@ -272,6 +277,33 @@ export default function TrayPopup() {
       });
     }).catch(() => {});
   }, [idleState]);
+
+  const linkedIssueRef = useRef<ExternalIssue | null>(null);
+  const prevTimerIdRef = useRef<number | null>(null);
+  const prevTimerBeginRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const prevId = prevTimerIdRef.current;
+    const prevBegin = prevTimerBeginRef.current;
+
+    prevTimerIdRef.current = timer?.id ?? null;
+    prevTimerBeginRef.current = timer?.beginSeconds ?? null;
+
+    if (prevId != null && (timer == null || timer.id !== prevId) && linkedIssueRef.current) {
+      const issue = linkedIssueRef.current;
+      linkedIssueRef.current = null;
+
+      if (issueIntegration.syncTime && issueIntegration.enabled && issueToken && prevBegin != null) {
+        const durationSeconds = Math.floor(Date.now() / 1000) - prevBegin;
+        const provider = createIssueProvider(issueIntegration, issueToken);
+        if (provider.addSpentTime) {
+          provider.addSpentTime(issue.id, durationSeconds).catch(() => {
+            logger.error("Failed to sync spent time to issue provider");
+          });
+        }
+      }
+    }
+  }, [timer?.id, timer?.beginSeconds, issueIntegration, issueToken]);
 
   // Global shortcut: toggle timer
   const timerRef = useRef(timer);
@@ -461,6 +493,14 @@ export default function TrayPopup() {
 
   const hiddenCount = hiddenKeys.size;
 
+  const timerIssueUrl = useMemo(() => {
+    if (!issueIntegration.enabled || !issueIntegration.baseUrl || !timer?.description) return null;
+    const base = issueIntegration.baseUrl.replace(/\/+$/, "");
+    const urlRegex = new RegExp(`${base.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\S+`, "i");
+    const match = timer.description.match(urlRegex);
+    return match?.[0] ?? null;
+  }, [issueIntegration.enabled, issueIntegration.baseUrl, timer?.description]);
+
   const handleStartRecent = (task: RecentTask) => {
     startTask(
       {
@@ -485,6 +525,10 @@ export default function TrayPopup() {
   const handleNewTaskSubmit = (payload: StartTaskPayload) => {
     startTask(payload);
   };
+
+  const handleIssueLinked = useCallback((issue: ExternalIssue | null) => {
+    linkedIssueRef.current = issue;
+  }, []);
 
   const compactTimer = popupLayout === "taskbar" || popupLayout === "timeline";
 
@@ -546,6 +590,10 @@ export default function TrayPopup() {
           showTags={featureFlags.featureTags}
           showCustomerSelect={featureFlags.featureCustomerSelect}
           showCustomStartTime={featureFlags.featureCustomStartTime}
+          showIssuePicker={issueIntegration.enabled}
+          issueIntegrationConfig={issueIntegration}
+          issueToken={issueToken}
+          onIssueLinked={handleIssueLinked}
         />
       ) : (
         <>
@@ -570,6 +618,7 @@ export default function TrayPopup() {
                 focusMode={popupLayout === "focus"}
                 showNote={featureFlags.featureNote}
                 showTags={featureFlags.featureTags}
+                issueUrl={timerIssueUrl}
               />
             ) : isPaused && pausedTimer ? (
               <PausedTimerCard

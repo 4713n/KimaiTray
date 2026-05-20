@@ -11,6 +11,7 @@ import GeneralSection from "../settings/GeneralSection";
 import AppearanceSection from "../settings/AppearanceSection";
 import TrayWindowSection from "../settings/TrayWindowSection";
 import FeaturesSection from "../settings/FeaturesSection";
+import IntegrationsSection from "../settings/IntegrationsSection";
 import IdleDetectionSection from "../settings/IdleDetectionSection";
 import ShortcutsSection from "../settings/ShortcutsSection";
 import AboutSection from "../settings/AboutSection";
@@ -41,6 +42,11 @@ const NAV_ICONS: Record<SettingsSection, ReactNode> = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M6 13.5V3.75m0 9.75a1.5 1.5 0 010 3m0-3a1.5 1.5 0 000 3m0 3.75V16.5m12-3V3.75m0 9.75a1.5 1.5 0 010 3m0-3a1.5 1.5 0 000 3m0 3.75V16.5m-6-9V3.75m0 3.75a1.5 1.5 0 010 3m0-3a1.5 1.5 0 000 3m0 9.75V10.5" />
     </svg>
   ),
+  integrations: (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 01-.657.643 48.39 48.39 0 01-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 01-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 00-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 01-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 00.657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 01-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 005.427-.63 48.05 48.05 0 00.582-4.717.532.532 0 00-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.96.401v0a.656.656 0 00.658-.663 48.422 48.422 0 00-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 01-.61-.58v0z" />
+    </svg>
+  ),
   idle: (
     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75 9.75 9.75 0 018.25 6c0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25 9.75 9.75 0 0012.75 21a9.753 9.753 0 009.002-5.998z" />
@@ -64,6 +70,7 @@ const NAV_LABEL_KEYS: Record<SettingsSection, string> = {
   appearance: "appearanceSettings.title",
   tray: "traySettings.title",
   features: "featuresSettings.title",
+  integrations: "integrations.title",
   idle: "idle.title",
   shortcuts: "shortcuts.title",
   about: "aboutSection.title",
@@ -75,6 +82,7 @@ const NAV_ORDER: SettingsSection[] = [
   "appearance",
   "tray",
   "features",
+  "integrations",
   "idle",
   "shortcuts",
   "about",
@@ -183,6 +191,9 @@ export default function Settings() {
           )}
           {section === "features" && (
             <FeaturesSection settings={settings} update={update} />
+          )}
+          {section === "integrations" && (
+            <IntegrationsSection settings={settings} update={update} />
           )}
           {section === "idle" && (
             <IdleDetectionSection settings={settings} update={update} />

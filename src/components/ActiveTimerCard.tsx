@@ -22,6 +22,7 @@ interface ActiveTimerCardProps {
   focusMode?: boolean;
   showNote?: boolean;
   showTags?: boolean;
+  issueUrl?: string | null;
 }
 
 function formatElapsed(seconds: number, showSeconds = true): string {
@@ -60,6 +61,7 @@ export default function ActiveTimerCard({
   focusMode,
   showNote = true,
   showTags = true,
+  issueUrl,
 }: ActiveTimerCardProps) {
   const { t } = useTranslation();
   const [elapsed, setElapsed] = useState(() =>
@@ -254,33 +256,50 @@ export default function ActiveTimerCard({
 
         {/* Row 2: Description (editable) */}
         {showNote && (
-          <div className="pl-4 mb-1.5">
-            {editingDesc ? (
-              <input
-                ref={descRef}
-                type="text"
-                value={descValue}
-                onChange={(e) => setDescValue(e.target.value)}
-                onBlur={saveDesc}
-                onKeyDown={handleDescKey}
-                placeholder={t("timer.addNote")}
-                className="w-full text-[11px] bg-white dark:bg-gray-800 border border-emerald-300 dark:border-emerald-700 rounded px-1.5 py-0.5 text-gray-700 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-emerald-400"
-              />
-            ) : (
-              <p
-                onClick={startEditDesc}
-                className={`text-[11px] truncate ${
-                  onEdit
-                    ? "cursor-text hover:bg-emerald-100/50 dark:hover:bg-emerald-900/30 rounded px-1 -mx-1 transition-colors"
-                    : ""
-                } ${
-                  timer.description
-                    ? "text-gray-500 dark:text-gray-400"
-                    : "text-gray-400 dark:text-gray-500 italic"
-                }`}
+          <div className="pl-4 mb-1.5 flex items-center gap-1">
+            <div className="min-w-0 flex-1">
+              {editingDesc ? (
+                <input
+                  ref={descRef}
+                  type="text"
+                  value={descValue}
+                  onChange={(e) => setDescValue(e.target.value)}
+                  onBlur={saveDesc}
+                  onKeyDown={handleDescKey}
+                  placeholder={t("timer.addNote")}
+                  className="w-full text-[11px] bg-white dark:bg-gray-800 border border-emerald-300 dark:border-emerald-700 rounded px-1.5 py-0.5 text-gray-700 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                />
+              ) : (
+                <p
+                  onClick={startEditDesc}
+                  className={`text-[11px] truncate ${
+                    onEdit
+                      ? "cursor-text hover:bg-emerald-100/50 dark:hover:bg-emerald-900/30 rounded px-1 -mx-1 transition-colors"
+                      : ""
+                  } ${
+                    timer.description
+                      ? "text-gray-500 dark:text-gray-400"
+                      : "text-gray-400 dark:text-gray-500 italic"
+                  }`}
+                >
+                  {timer.description || t("timer.addNote")}
+                </p>
+              )}
+            </div>
+            {issueUrl && !editingDesc && (
+              <button
+                type="button"
+                onClick={async () => {
+                  const { openUrl } = await import("@tauri-apps/plugin-opener");
+                  openUrl(issueUrl);
+                }}
+                title={t("integrations.openInBrowser")}
+                className="shrink-0 p-0.5 rounded text-gray-400 dark:text-gray-500 hover:text-[var(--accent)] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent)]"
               >
-                {timer.description || t("timer.addNote")}
-              </p>
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                </svg>
+              </button>
             )}
           </div>
         )}

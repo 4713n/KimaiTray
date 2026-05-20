@@ -47,6 +47,8 @@ export const defaultSettings: AppSettings = {
   displayMode: "tray",
 
   autoUpdate: true,
+
+  issueIntegrations: {},
 };
 
 let storePromise: ReturnType<typeof load> | null = null;

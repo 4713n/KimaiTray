@@ -5,6 +5,10 @@ import type { KimaiClient } from "../api/kimaiClient";
 import { getCustomers, getProjects } from "../api/projectApi";
 import { getActivities } from "../api/activityApi";
 import type { StartTaskPayload } from "../hooks/useStartTask";
+import type { IssueIntegrationSettings } from "../integrations/issues/types";
+import type { ExternalIssue } from "../integrations/issues/types";
+import IssuePicker from "../integrations/issues/IssuePicker";
+import IssueLinkActions from "../integrations/issues/IssueLinkActions";
 import TagsInput from "./TagsInput";
 import DateTimePicker from "./DateTimePicker";
 import SearchableSelect from "./SearchableSelect";
@@ -19,6 +23,10 @@ interface NewTaskFormProps {
   showTags?: boolean;
   showCustomerSelect?: boolean;
   showCustomStartTime?: boolean;
+  showIssuePicker?: boolean;
+  issueIntegrationConfig?: IssueIntegrationSettings | null;
+  issueToken?: string | null;
+  onIssueLinked?: (issue: ExternalIssue | null) => void;
 }
 
 const selectCls =
@@ -34,6 +42,10 @@ export default function NewTaskForm({
   showTags = true,
   showCustomerSelect = true,
   showCustomStartTime = true,
+  showIssuePicker = false,
+  issueIntegrationConfig,
+  issueToken,
+  onIssueLinked,
 }: NewTaskFormProps) {
   const { t } = useTranslation();
   const [customerId, setCustomerId] = useState<number | null>(null);
@@ -41,6 +53,7 @@ export default function NewTaskForm({
   const [activityId, setActivityId] = useState<number | null>(null);
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [selectedIssue, setSelectedIssue] = useState<ExternalIssue | null>(null);
   const [useCustomTime, setUseCustomTime] = useState(false);
   const [beginTime, setBeginTime] = useState("");
 
@@ -97,6 +110,7 @@ export default function NewTaskForm({
 
   const handleSubmit = () => {
     if (!canSubmit) return;
+    onIssueLinked?.(selectedIssue);
     onSubmit({
       projectId: projectId!,
       activityId: activityId!,
@@ -175,6 +189,28 @@ export default function NewTaskForm({
             disabled={isSubmitting || projectId == null}
           />
         </div>
+
+        {showIssuePicker && issueIntegrationConfig?.enabled && issueToken && (
+          <div>
+            <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">
+              {t("integrations.issuePicker")}
+            </label>
+            <IssuePicker
+              config={issueIntegrationConfig}
+              token={issueToken}
+              selectedIssue={selectedIssue}
+              onSelectIssue={setSelectedIssue}
+              disabled={isSubmitting}
+            />
+            {selectedIssue && (
+              <IssueLinkActions
+                issue={selectedIssue}
+                description={description}
+                onDescriptionChange={setDescription}
+              />
+            )}
+          </div>
+        )}
 
         {showNote && (
           <div>

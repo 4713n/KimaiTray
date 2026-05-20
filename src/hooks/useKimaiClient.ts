@@ -4,6 +4,8 @@ import { createKimaiClient, type KimaiClient } from "../api/kimaiClient";
 import { getApiToken } from "../api/secureStore";
 import { loadSettings, onSettingsChange, saveSettings } from "../settings/service";
 import type { SavedConnection } from "../types";
+import type { IssueIntegrationSettings } from "../integrations/issues/types";
+import { getIssueToken } from "../integrations/issues/issueTokenStore";
 
 interface IdleSettings {
   enableIdleDetection: boolean;
@@ -50,6 +52,8 @@ interface UseKimaiClientResult {
   connections: SavedConnection[];
   activeConnectionId: string;
   switchConnection: (id: string) => void;
+  issueIntegration: IssueIntegrationSettings;
+  issueToken: string | null;
 }
 
 const defaultIdleSettings: IdleSettings = {
@@ -95,6 +99,18 @@ export function useKimaiClient(): UseKimaiClientResult {
   });
   const [shortcutSettings, setShortcutSettings] =
     useState<ShortcutSettings>(defaultShortcutSettings);
+  const [issueIntegration, setIssueIntegration] =
+    useState<IssueIntegrationSettings>({
+      enabled: false,
+      provider: "gitlab",
+      baseUrl: "",
+      apiBaseUrl: "",
+      projectPathOrRepo: "",
+      defaultState: "opened",
+      assigneeOnly: false,
+      syncTime: false,
+    });
+  const [issueToken, setIssueToken] = useState<string | null>(null);
 
   const baseUrlRef = useRef("");
 
@@ -136,6 +152,27 @@ export function useKimaiClient(): UseKimaiClientResult {
       featureCustomerSelect: s.featureCustomerSelect ?? true,
       featureCustomStartTime: s.featureCustomStartTime ?? true,
     });
+    const connId = s.activeConnectionId ?? "";
+    const issueConfig = (s.issueIntegrations ?? {})[connId] ?? {
+      enabled: false,
+      provider: "gitlab" as const,
+      baseUrl: "",
+      apiBaseUrl: "",
+      projectPathOrRepo: "",
+      defaultState: "opened" as const,
+      assigneeOnly: false,
+    };
+    setIssueIntegration(issueConfig);
+    if (issueConfig.enabled && connId) {
+      try {
+        const it = await getIssueToken(connId);
+        setIssueToken(it);
+      } catch {
+        setIssueToken(null);
+      }
+    } else {
+      setIssueToken(null);
+    }
     if (s.kimaiUrl) {
       try {
         const t = await getApiToken(s.kimaiUrl);
@@ -218,5 +255,7 @@ export function useKimaiClient(): UseKimaiClientResult {
     connections,
     activeConnectionId,
     switchConnection,
+    issueIntegration,
+    issueToken,
   };
 }
