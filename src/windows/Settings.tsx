@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getVersion } from "@tauri-apps/api/app";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { SettingsSection } from "../types";
 import { useSettings } from "../settings/useSettings";
 import { useAppearance } from "../hooks/useAppearance";
@@ -86,6 +87,15 @@ export default function Settings() {
 
   useEffect(() => {
     getVersion().then(setAppVersion);
+  }, []);
+
+  useEffect(() => {
+    const win = getCurrentWindow();
+    const unlisten = win.listen<string>("kimai://navigate-section", (e) => {
+      const target = e.payload as SettingsSection;
+      if (NAV_ORDER.includes(target)) setSection(target);
+    });
+    return () => { unlisten.then((fn) => fn()); };
   }, []);
   const {
     settings,

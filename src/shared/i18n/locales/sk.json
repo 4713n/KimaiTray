@@ -35,6 +35,7 @@
     "newTask": "Nová úloha",
     "notConnected": "Nepripojené",
     "connectHint": "Pravý klik na ikonu → Nastavenia",
+    "setupConnection": "Nastaviť pripojenie",
     "stopping": "Zastavuje sa…"
   },
   "timer": {

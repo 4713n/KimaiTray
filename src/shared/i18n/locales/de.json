@@ -35,6 +35,7 @@
     "newTask": "Neue Aufgabe",
     "notConnected": "Nicht verbunden",
     "connectHint": "Rechtsklick auf Symbol → Einstellungen",
+    "setupConnection": "Verbindung einrichten",
     "stopping": "Wird gestoppt…"
   },
   "timer": {

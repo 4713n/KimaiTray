@@ -35,6 +35,7 @@
     "newTask": "New Task",
     "notConnected": "Not connected",
     "connectHint": "Right-click tray → Settings to connect",
+    "setupConnection": "Setup Connection",
     "stopping": "Stopping…"
   },
   "timer": {
