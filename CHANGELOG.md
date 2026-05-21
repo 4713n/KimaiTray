@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2] - 2026-05-21
+
+### Bug Fixes
+
+- **Fixed "Verification failed" when starting from recent** — active timesheets are now fetched from the server before starting a new timer, eliminating race conditions caused by stale cached state
+- **Notes and tags copied from recent entries** — description and tags are now carried over when restarting a timer from the recent tasks list
+
 ## [0.5.1] - 2026-05-21
 
 ### Improvements
