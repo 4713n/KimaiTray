@@ -1,4 +1,4 @@
-import type { ExternalIssue, IssueProvider, IssueIntegrationSettings } from "./types";
+import type { ExternalIssue, ExternalLabel, IssueProvider, IssueIntegrationSettings } from "./types";
 import { logger } from "../../utils/logger";
 
 interface GitHubIssue {
@@ -13,6 +13,11 @@ interface GitHubIssue {
 
 interface GitHubSearchResult {
   items: GitHubIssue[];
+}
+
+interface GitHubLabel {
+  name: string;
+  color: string;
 }
 
 function normalize(issue: GitHubIssue): ExternalIssue {
@@ -87,12 +92,16 @@ export function createGitHubProvider(
     async searchIssues(query: string) {
       const assignee = config.assigneeOnly ? await getUsername() : "";
 
+      const labelFilter = config.filterLabels?.length
+        ? config.filterLabels.map((l) => `+label:"${l}"`).join("")
+        : "";
+
       if (query.length >= 2) {
         const stateFilter = config.defaultState === "all" ? "" : "+state:open";
         const assigneeFilter = assignee ? `+assignee:${assignee}` : "";
         const result = await request<GitHubSearchResult>(
           "/search/issues",
-          { q: `${query}+repo:${config.projectPathOrRepo}+is:issue${stateFilter}${assigneeFilter}`, per_page: "20" },
+          { q: `${query}+repo:${config.projectPathOrRepo}+is:issue${stateFilter}${assigneeFilter}${labelFilter}`, per_page: "20" },
         );
         return result.items.filter((i) => !i.pull_request).map(normalize);
       }
@@ -106,6 +115,9 @@ export function createGitHubProvider(
       if (assignee) {
         params.assignee = assignee;
       }
+      if (config.filterLabels?.length) {
+        params.labels = config.filterLabels.join(",");
+      }
 
       const issues = await request<GitHubIssue[]>(
         `/repos/${config.projectPathOrRepo}/issues`,
@@ -116,6 +128,14 @@ export function createGitHubProvider(
 
     getIssueUrl(issue: ExternalIssue) {
       return issue.webUrl;
+    },
+
+    async fetchLabels(): Promise<ExternalLabel[]> {
+      const labels = await request<GitHubLabel[]>(
+        `/repos/${config.projectPathOrRepo}/labels`,
+        { per_page: "100" },
+      );
+      return labels.map((l) => ({ name: l.name, color: `#${l.color}` }));
     },
   };
 }

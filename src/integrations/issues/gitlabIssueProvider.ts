@@ -1,4 +1,4 @@
-import type { ExternalIssue, IssueProvider, IssueIntegrationSettings } from "./types";
+import type { ExternalIssue, ExternalLabel, IssueProvider, IssueIntegrationSettings } from "./types";
 import { logger } from "../../utils/logger";
 
 interface GitLabIssue {
@@ -8,6 +8,11 @@ interface GitLabIssue {
   web_url: string;
   labels: string[];
   author: { username: string };
+}
+
+interface GitLabLabel {
+  name: string;
+  color: string;
 }
 
 function normalize(issue: GitLabIssue): ExternalIssue {
@@ -82,6 +87,9 @@ export function createGitLabProvider(
       if (query.length >= 2) {
         params.search = query;
       }
+      if (config.filterLabels?.length) {
+        params.labels = config.filterLabels.join(",");
+      }
 
       const issues = await request<GitLabIssue[]>(
         `/projects/${encodedPath}/issues`,
@@ -119,6 +127,14 @@ export function createGitLabProvider(
       }
 
       logger.info(`Logged ${duration} on GitLab issue #${issueId}`);
+    },
+
+    async fetchLabels(): Promise<ExternalLabel[]> {
+      const labels = await request<GitLabLabel[]>(
+        `/projects/${encodedPath}/labels`,
+        { per_page: "100" },
+      );
+      return labels.map((l) => ({ name: l.name, color: l.color }));
     },
   };
 }

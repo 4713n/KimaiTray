@@ -339,6 +339,9 @@
     "copied": "Zkopírováno!",
     "assigneeOnly": "Přiřazené mně",
     "assigneeOnlyDescription": "Zobrazit pouze úkoly přiřazené přihlášenému uživateli",
+    "filterLabels": "Filtrovat podle štítků",
+    "filterLabelsDescription": "Zobrazit pouze úkoly s vybranými štítky. Nejprve otestujte připojení pro načtení dostupných štítků.",
+    "clearLabels": "Zrušit všechny štítky",
     "syncTime": "Synchronizovat čas",
     "syncTimeDescription": "Zaznamenat strávený čas do propojené GitLab úlohy po zastavení časovače",
     "perConnectionHint": "Tato nastavení platí pouze pro aktuálně zvolené připojení"

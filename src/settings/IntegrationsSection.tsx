@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { AppSettings } from "../types";
-import type { IssueIntegrationSettings } from "../integrations/issues/types";
+import type { IssueIntegrationSettings, ExternalLabel } from "../integrations/issues/types";
 import { createIssueProvider } from "../integrations/issues/issueProvider";
 import {
   getIssueToken,
@@ -25,6 +25,7 @@ const emptyConfig: IssueIntegrationSettings = {
   defaultState: "opened",
   assigneeOnly: false,
   syncTime: false,
+  filterLabels: [],
 };
 
 interface Props {
@@ -44,6 +45,7 @@ export default function IntegrationsSection({ settings, update }: Props) {
     "idle" | "testing" | "success" | "error"
   >("idle");
   const [testMessage, setTestMessage] = useState("");
+  const [availableLabels, setAvailableLabels] = useState<ExternalLabel[]>([]);
 
   useEffect(() => {
     if (!connectionId) {
@@ -56,6 +58,7 @@ export default function IntegrationsSection({ settings, update }: Props) {
     setTestStatus("idle");
     setTestMessage("");
     setShowToken(false);
+    setAvailableLabels([]);
   }, [connectionId]);
 
   const updateField = useCallback(
@@ -93,6 +96,7 @@ export default function IntegrationsSection({ settings, update }: Props) {
     if (!connectionId) return;
     setTestStatus("testing");
     setTestMessage("");
+    setAvailableLabels([]);
 
     try {
       const provider = createIssueProvider(config, issueToken);
@@ -103,6 +107,11 @@ export default function IntegrationsSection({ settings, update }: Props) {
         setTestMessage(
           t("integrations.connectionSuccess", { count: result.count ?? 0 }),
         );
+        if (provider.fetchLabels) {
+          provider.fetchLabels()
+            .then(setAvailableLabels)
+            .catch(() => {});
+        }
       } else {
         setTestStatus("error");
         setTestMessage(result.error ?? t("integrations.connectionFailed"));
@@ -295,6 +304,54 @@ export default function IntegrationsSection({ settings, update }: Props) {
               disabled={disabled}
             />
           </FieldGroup>
+
+          {testStatus === "success" && availableLabels.length > 0 && (
+            <FieldGroup
+              label={t("integrations.filterLabels")}
+              description={t("integrations.filterLabelsDescription")}
+            >
+              <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2">
+                {availableLabels.map((label) => {
+                  const selected = (config.filterLabels ?? []).includes(label.name);
+                  return (
+                    <button
+                      key={label.name}
+                      type="button"
+                      onClick={() => {
+                        const current = config.filterLabels ?? [];
+                        const next = selected
+                          ? current.filter((l) => l !== label.name)
+                          : [...current, label.name];
+                        updateField("filterLabels", next);
+                      }}
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors
+                        border focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-400
+                        ${selected
+                          ? "border-transparent text-white shadow-sm"
+                          : "border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        }`}
+                      style={selected ? { backgroundColor: label.color } : undefined}
+                    >
+                      <span
+                        className="inline-block h-2 w-2 rounded-full shrink-0"
+                        style={{ backgroundColor: label.color }}
+                      />
+                      {label.name}
+                    </button>
+                  );
+                })}
+              </div>
+              {(config.filterLabels ?? []).length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => updateField("filterLabels", [])}
+                  className="mt-1.5 text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  {t("integrations.clearLabels")}
+                </button>
+              )}
+            </FieldGroup>
+          )}
 
           {config.provider === "gitlab" && (
             <FieldGroup

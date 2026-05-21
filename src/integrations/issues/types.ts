@@ -10,6 +10,7 @@ export interface IssueIntegrationSettings {
   defaultState: IssueState;
   assigneeOnly: boolean;
   syncTime: boolean;
+  filterLabels: string[];
 }
 
 export interface ExternalIssue {
@@ -21,6 +22,11 @@ export interface ExternalIssue {
   author: string;
 }
 
+export interface ExternalLabel {
+  name: string;
+  color: string;
+}
+
 export interface IssueProvider {
   testConnection(): Promise<{
     success: boolean;
@@ -30,4 +36,5 @@ export interface IssueProvider {
   searchIssues(query: string): Promise<ExternalIssue[]>;
   getIssueUrl(issue: ExternalIssue): string;
   addSpentTime?(issueId: number, durationSeconds: number): Promise<void>;
+  fetchLabels?(): Promise<ExternalLabel[]>;
 }

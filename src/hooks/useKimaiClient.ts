@@ -109,6 +109,7 @@ export function useKimaiClient(): UseKimaiClientResult {
       defaultState: "opened",
       assigneeOnly: false,
       syncTime: false,
+      filterLabels: [],
     });
   const [issueToken, setIssueToken] = useState<string | null>(null);
 

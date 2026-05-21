@@ -339,6 +339,9 @@
     "copied": "Copied!",
     "assigneeOnly": "Assigned to me",
     "assigneeOnlyDescription": "Show only issues assigned to the authenticated user",
+    "filterLabels": "Filter by labels",
+    "filterLabelsDescription": "Show only issues with selected labels. Test the connection first to load available labels.",
+    "clearLabels": "Clear all labels",
     "syncTime": "Sync spent time",
     "syncTimeDescription": "Log spent time to the linked GitLab issue when the timer stops",
     "perConnectionHint": "These settings apply only to the currently active connection"

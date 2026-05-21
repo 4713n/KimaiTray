@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.5.0] - 2026-05-21
+
+### New Features
+
+- **Label filter for issues** — filter issues by labels from your GitLab or GitHub project; available labels are fetched automatically after a successful connection test and displayed as colored, toggleable chips in the integration settings
+
+### Translations
+
+- Added label filter translations for EN, SK, CS, DE, UK
+
 ## [0.4.1] - 2026-05-20
 
 ### Bug Fixes
