@@ -50,10 +50,13 @@ export default function PausedTimerCard({
           <span className="text-[11px] font-medium text-gray-800 dark:text-gray-200 truncate">
             {paused.project}
           </span>
-          <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 shrink-0">
+          <span className="text-[10px] text-gray-400 dark:text-gray-500 truncate">
+            {paused.activity}
+          </span>
+          <span className="ml-auto rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 shrink-0">
             {t("pause.paused")}
           </span>
-          <div className="ml-auto flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={onResume}
               disabled={busy}
