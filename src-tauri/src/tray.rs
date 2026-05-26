@@ -1,5 +1,6 @@
 use std::sync::atomic::{AtomicBool, AtomicU64, AtomicU8, Ordering};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::sync::Mutex;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tauri::{
     image::Image,
     menu::{Menu, MenuBuilder, MenuItem},
@@ -12,6 +13,105 @@ use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_store::StoreExt;
 
 const STORE_PATH: &str = "settings.json";
+
+// Native tray ticker — updates the menu bar title every second from a Rust thread,
+// immune to macOS WebKit throttling of hidden webview JS timers.
+
+struct TrayTickerRunning {
+    begin_seconds: u64,
+    project: String,
+    activity: String,
+    label_style: String,
+    show_seconds: bool,
+}
+
+enum TrayTickerState {
+    Idle,
+    Running(TrayTickerRunning),
+}
+
+static TRAY_TICKER_STATE: Mutex<TrayTickerState> = Mutex::new(TrayTickerState::Idle);
+
+fn format_elapsed(secs: u64, show_seconds: bool) -> String {
+    let h = secs / 3600;
+    let m = (secs % 3600) / 60;
+    let s = secs % 60;
+    if show_seconds {
+        format!("{:02}:{:02}:{:02}", h, m, s)
+    } else {
+        format!("{:02}:{:02}", h, m)
+    }
+}
+
+fn tick_tray(app: &AppHandle) {
+    let snapshot = {
+        let state = TRAY_TICKER_STATE.lock().unwrap();
+        match &*state {
+            TrayTickerState::Running(c) => Some((
+                c.begin_seconds,
+                c.project.clone(),
+                c.activity.clone(),
+                c.label_style.clone(),
+                c.show_seconds,
+            )),
+            TrayTickerState::Idle => None,
+        }
+    };
+
+    if let Some((begin_seconds, project, activity, label_style, show_seconds)) = snapshot {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
+        let secs = now.saturating_sub(begin_seconds);
+
+        if let Some(tray) = app.tray_by_id("main") {
+            let elapsed = format_elapsed(secs, true);
+            let _ = tray.set_tooltip(Some(&format!("{project} — {activity} — {elapsed}")));
+
+            if label_style == "timer" {
+                let title = format_elapsed(secs, show_seconds);
+                let _ = tray.set_title(Some(&title));
+            }
+        }
+    }
+}
+
+#[tauri::command]
+pub fn start_tray_ticker(
+    app: AppHandle,
+    begin_seconds: u64,
+    project: String,
+    activity: String,
+    label_style: String,
+    show_seconds: bool,
+) -> Result<(), String> {
+    {
+        let mut state = TRAY_TICKER_STATE.lock().map_err(|e| e.to_string())?;
+        *state = TrayTickerState::Running(TrayTickerRunning {
+            begin_seconds,
+            project,
+            activity,
+            label_style,
+            show_seconds,
+        });
+    }
+    tick_tray(&app);
+    Ok(())
+}
+
+#[tauri::command]
+pub fn stop_tray_ticker(app: AppHandle) -> Result<(), String> {
+    let mut state = TRAY_TICKER_STATE.lock().map_err(|e| e.to_string())?;
+    *state = TrayTickerState::Idle;
+    drop(state);
+
+    if let Some(tray) = app.tray_by_id("main") {
+        let _ = tray.set_title(Some(""));
+        let _ = tray.set_tooltip(Some("KimaiTray"));
+    }
+    Ok(())
+}
 
 #[tauri::command]
 pub fn set_tray_tooltip(app: AppHandle, text: String) -> Result<(), String> {
@@ -468,6 +568,14 @@ pub fn create_tray(app: &AppHandle) -> tauri::Result<()> {
             let _ = tray.set_menu(None::<Menu<tauri::Wry>>);
         }
     }
+
+    // Background thread: updates tray title every second while a timer is running.
+    // Runs natively so macOS cannot throttle it like webview JS timers.
+    let ticker_app = app.clone();
+    std::thread::spawn(move || loop {
+        std::thread::sleep(Duration::from_secs(1));
+        tick_tray(&ticker_app);
+    });
 
     Ok(())
 }

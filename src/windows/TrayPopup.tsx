@@ -25,13 +25,12 @@ import { useHiddenTasks } from "../hooks/useHiddenTasks";
 import { useFavorites } from "../hooks/useFavorites";
 import { useDeleteTimesheet } from "../hooks/useDeleteTimesheet";
 import { useIdleDetection } from "../hooks/useIdleDetection";
-import { setTrayTooltip, setTrayTitle, setTrayIcon, updateTrayMenu, registerShortcuts, setAlwaysOnTop } from "../api/trayApi";
+import { setTrayTooltip, setTrayTitle, setTrayIcon, startTrayTicker, stopTrayTicker, updateTrayMenu, registerShortcuts, setAlwaysOnTop } from "../api/trayApi";
 import { formatAcceleratorForDisplay } from "../settings/Controls";
 import { useAppearance } from "../hooks/useAppearance";
 import { useLanguageSync } from "../hooks/useLanguageSync";
 import { useUpdater } from "../hooks/useUpdater";
 import { updateTimesheet, stopTimesheet } from "../api/timesheetApi";
-import { formatElapsed } from "../components/ActiveTimerCard";
 import type { RecentTask, FavoriteTask } from "../types";
 import type { ExternalIssue } from "../integrations/issues/types";
 import { createIssueProvider } from "../integrations/issues/issueProvider";
@@ -441,9 +440,12 @@ export default function TrayPopup() {
     }
   }, [status, !!timer, hasPausedTimers]);
 
-  // Update tray tooltip and menu bar title
+  // Update tray tooltip and menu bar title.
+  // The per-second tick runs in a native Rust thread (start/stopTrayTicker)
+  // so macOS cannot throttle it like it does with webview JS timers.
   useEffect(() => {
     if (!timer && hasPausedTimers) {
+      stopTrayTicker();
       const first = pausedTimers[0];
       const suffix = pausedTimers.length > 1 ? ` (+${pausedTimers.length - 1})` : "";
       setTrayTooltip(`KimaiTray — ${t("pause.paused")} — ${first.project}${suffix}`);
@@ -456,41 +458,20 @@ export default function TrayPopup() {
     }
 
     if (!timer) {
-      setTrayTooltip("KimaiTray");
-      setTrayTitle("");
+      stopTrayTicker();
       return;
     }
-    const tick = () => {
-      const secs = Math.max(
-        0,
-        Math.floor(Date.now() / 1000) - timer.beginSeconds,
-      );
-      const elapsed = formatElapsed(secs);
-      const elapsedTray = formatElapsed(secs, traySettings.showSecondsInTimer);
 
-      setTrayTooltip(`${timer.project} — ${timer.activity} — ${elapsed}`);
+    startTrayTicker(
+      timer.beginSeconds,
+      timer.project,
+      timer.activity,
+      traySettings.menuBarLabelStyle,
+      traySettings.showSecondsInTimer,
+    );
 
-      const { menuBarLabelStyle } = traySettings;
-
-      if (menuBarLabelStyle === "hidden") {
-        setTrayTitle("");
-        return;
-      }
-
-      if (menuBarLabelStyle === "timer") {
-        setTrayTitle(elapsedTray);
-      } else if (menuBarLabelStyle === "project") {
-        setTrayTitle(timer.project);
-      } else if (menuBarLabelStyle === "activity") {
-        setTrayTitle(timer.activity);
-      }
-    };
-    tick();
-    const id = setInterval(tick, 1000);
     return () => {
-      clearInterval(id);
-      setTrayTooltip("KimaiTray");
-      setTrayTitle("");
+      stopTrayTicker();
     };
   }, [timer?.id, timer?.beginSeconds, timer?.project, timer?.activity, hasPausedTimers, pausedTimers, traySettings, t]);
 

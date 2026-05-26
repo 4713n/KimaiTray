@@ -18,6 +18,28 @@ export async function setTrayTitle(title: string): Promise<void> {
 
 export type TrayIconState = "idle" | "running" | "paused" | "error";
 
+export async function startTrayTicker(
+  beginSeconds: number,
+  project: string,
+  activity: string,
+  labelStyle: string,
+  showSeconds: boolean,
+): Promise<void> {
+  try {
+    await invoke("start_tray_ticker", { beginSeconds, project, activity, labelStyle, showSeconds });
+  } catch {
+    // best-effort
+  }
+}
+
+export async function stopTrayTicker(): Promise<void> {
+  try {
+    await invoke("stop_tray_ticker");
+  } catch {
+    // best-effort
+  }
+}
+
 export async function setTrayIcon(state: TrayIconState): Promise<void> {
   try {
     await invoke("set_tray_icon", { state });
