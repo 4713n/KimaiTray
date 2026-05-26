@@ -4,22 +4,24 @@ import type { KimaiClient } from "../api/kimaiClient";
 import { stopTimesheet, startTimesheet } from "../api/timesheetApi";
 import { serializeKimaiTags } from "../api/tagUtils";
 import {
-  loadPausedTimer,
-  savePausedTimer,
-  clearPausedTimer,
+  loadPausedTimers,
+  addPausedTimer,
+  removePausedTimer,
   type PausedTimerData,
 } from "../api/pauseStore";
 import type { ActiveTimer } from "../types";
 
 interface UsePauseTimerResult {
-  pausedTimer: PausedTimerData | null;
-  isPaused: boolean;
+  pausedTimers: PausedTimerData[];
+  hasPausedTimers: boolean;
   pauseTimer: () => void;
-  resumeTimer: () => void;
-  fullStop: () => void;
+  resumeTimer: (id: string) => void;
+  discardPausedTimer: (id: string) => void;
+  stopActiveTimer: () => void;
   isPausing: boolean;
-  isResuming: boolean;
-  isStopping: boolean;
+  resumingId: string | null;
+  discardingId: string | null;
+  isStoppingActive: boolean;
   pauseError: string | null;
   dismissPauseError: () => void;
 }
@@ -30,33 +32,22 @@ export function usePauseTimer(
   baseUrl: string,
 ): UsePauseTimerResult {
   const qc = useQueryClient();
-  const [pausedTimer, setPausedTimer] = useState<PausedTimerData | null>(null);
+  const [pausedTimers, setPausedTimers] = useState<PausedTimerData[]>([]);
   const [pauseError, setPauseError] = useState<string | null>(null);
-  const loaded = useRef(false);
-  const pausedTimerRef = useRef(pausedTimer);
-  pausedTimerRef.current = pausedTimer;
+  const [resumingId, setResumingId] = useState<string | null>(null);
+  const [discardingId, setDiscardingId] = useState<string | null>(null);
+  const timerRef = useRef(timer);
+  timerRef.current = timer;
 
   useEffect(() => {
-    loadPausedTimer().then((data) => {
-      if (data && data.baseUrl === baseUrl) {
-        setPausedTimer(data);
-      } else if (data) {
-        clearPausedTimer();
+    loadPausedTimers().then((all) => {
+      const matching = all.filter((t) => t.baseUrl === baseUrl);
+      if (matching.length !== all.length) {
+        // Different baseUrl items exist — leave them in store, just show matching
       }
-      loaded.current = true;
+      setPausedTimers(matching);
     });
   }, [baseUrl]);
-
-  // API running timer takes precedence over local paused state.
-  // Only reacts to timer?.id changes — not pausedTimer — to avoid
-  // clearing pause state before the query invalidation lands.
-  useEffect(() => {
-    if (!loaded.current) return;
-    if (timer && pausedTimerRef.current) {
-      clearPausedTimer();
-      setPausedTimer(null);
-    }
-  }, [timer?.id]);
 
   const invalidate = useCallback(() => {
     qc.invalidateQueries({ queryKey: ["active-timesheets"] });
@@ -64,10 +55,12 @@ export function usePauseTimer(
     qc.invalidateQueries({ queryKey: ["today-timesheets"] });
   }, [qc]);
 
+  // Pause the currently active timer → add to paused array
   const pauseMut = useMutation({
     mutationFn: async (activeTimer: ActiveTimer) => {
       await stopTimesheet(client!, activeTimer.id);
       const data: PausedTimerData = {
+        id: crypto.randomUUID(),
         baseUrl,
         lastTimesheetId: activeTimer.id,
         projectId: activeTimer.projectId,
@@ -79,11 +72,11 @@ export function usePauseTimer(
         tags: activeTimer.tags,
         pausedAt: new Date().toISOString(),
       };
-      await savePausedTimer(data);
-      return data;
+      const updated = await addPausedTimer(data);
+      return updated.filter((t) => t.baseUrl === baseUrl);
     },
-    onSuccess: (data) => {
-      setPausedTimer(data);
+    onSuccess: (filtered) => {
+      setPausedTimers(filtered);
       setPauseError(null);
       invalidate();
     },
@@ -92,43 +85,81 @@ export function usePauseTimer(
     },
   });
 
+  // Resume a specific paused timer; auto-pause running timer if any (swap)
   const resumeMut = useMutation({
-    mutationFn: async (data: PausedTimerData) => {
-      const result = await startTimesheet(client!, {
-        project: data.projectId,
-        activity: data.activityId,
-        description: data.description || undefined,
+    mutationFn: async (target: PausedTimerData) => {
+      setResumingId(target.id);
+      const currentTimer = timerRef.current;
+
+      // Auto-pause the running timer first (swap)
+      if (currentTimer) {
+        await stopTimesheet(client!, currentTimer.id);
+        const swapData: PausedTimerData = {
+          id: crypto.randomUUID(),
+          baseUrl,
+          lastTimesheetId: currentTimer.id,
+          projectId: currentTimer.projectId,
+          activityId: currentTimer.activityId,
+          project: currentTimer.project,
+          projectColor: currentTimer.projectColor,
+          activity: currentTimer.activity,
+          description: currentTimer.description,
+          tags: currentTimer.tags,
+          pausedAt: new Date().toISOString(),
+        };
+        await addPausedTimer(swapData);
+      }
+
+      // Start the target paused timer
+      await startTimesheet(client!, {
+        project: target.projectId,
+        activity: target.activityId,
+        description: target.description || undefined,
         tags:
-          data.tags.length > 0 ? serializeKimaiTags(data.tags) : undefined,
+          target.tags.length > 0 ? serializeKimaiTags(target.tags) : undefined,
       });
-      await clearPausedTimer();
-      return result;
+
+      // Remove the resumed timer from store
+      const updated = await removePausedTimer(target.id);
+      return updated.filter((t) => t.baseUrl === baseUrl);
     },
-    onSuccess: () => {
-      setPausedTimer(null);
+    onSuccess: (filtered) => {
+      setPausedTimers(filtered);
       setPauseError(null);
+      setResumingId(null);
       invalidate();
     },
     onError: (err: Error) => {
       setPauseError(err.message);
+      setResumingId(null);
     },
   });
 
-  const fullStopMut = useMutation({
-    mutationFn: async ({
-      timerId,
-      hasRunning,
-    }: {
-      timerId?: number;
-      hasRunning: boolean;
-    }) => {
-      if (hasRunning && timerId) {
-        await stopTimesheet(client!, timerId);
-      }
-      await clearPausedTimer();
+  // Discard a specific paused timer without resuming
+  const discardMut = useMutation({
+    mutationFn: async (id: string) => {
+      setDiscardingId(id);
+      const updated = await removePausedTimer(id);
+      return updated.filter((t) => t.baseUrl === baseUrl);
+    },
+    onSuccess: (filtered) => {
+      setPausedTimers(filtered);
+      setPauseError(null);
+      setDiscardingId(null);
+      invalidate();
+    },
+    onError: (err: Error) => {
+      setPauseError(err.message);
+      setDiscardingId(null);
+    },
+  });
+
+  // Stop only the active timer — does not touch paused timers
+  const stopActiveMut = useMutation({
+    mutationFn: async (timerId: number) => {
+      await stopTimesheet(client!, timerId);
     },
     onSuccess: () => {
-      setPausedTimer(null);
       setPauseError(null);
       invalidate();
     },
@@ -143,34 +174,45 @@ export function usePauseTimer(
     pauseMut.mutate(timer);
   }, [client, timer, pauseMut]);
 
-  const resumeTimer = useCallback(() => {
-    if (!client || !pausedTimer || resumeMut.isPending) return;
-    setPauseError(null);
-    resumeMut.mutate(pausedTimer);
-  }, [client, pausedTimer, resumeMut]);
+  const resumeTimer = useCallback(
+    (id: string) => {
+      if (!client || resumeMut.isPending) return;
+      const target = pausedTimers.find((t) => t.id === id);
+      if (!target) return;
+      setPauseError(null);
+      resumeMut.mutate(target);
+    },
+    [client, pausedTimers, resumeMut],
+  );
 
-  const fullStop = useCallback(() => {
-    if (fullStopMut.isPending) return;
+  const discardPausedTimer = useCallback(
+    (id: string) => {
+      if (discardMut.isPending) return;
+      setPauseError(null);
+      discardMut.mutate(id);
+    },
+    [discardMut],
+  );
+
+  const stopActiveTimer = useCallback(() => {
+    if (!timer || stopActiveMut.isPending) return;
     setPauseError(null);
-    fullStopMut.mutate({
-      timerId: timer?.id,
-      hasRunning: !!timer,
-    });
-  }, [timer, fullStopMut]);
+    stopActiveMut.mutate(timer.id);
+  }, [timer, stopActiveMut]);
 
   const dismissPauseError = useCallback(() => setPauseError(null), []);
 
-  const isPaused = !timer && pausedTimer !== null;
-
   return {
-    pausedTimer: isPaused ? pausedTimer : null,
-    isPaused,
+    pausedTimers,
+    hasPausedTimers: pausedTimers.length > 0,
     pauseTimer,
     resumeTimer,
-    fullStop,
+    discardPausedTimer,
+    stopActiveTimer,
     isPausing: pauseMut.isPending,
-    isResuming: resumeMut.isPending,
-    isStopping: fullStopMut.isPending,
+    resumingId,
+    discardingId,
+    isStoppingActive: stopActiveMut.isPending,
     pauseError,
     dismissPauseError,
   };

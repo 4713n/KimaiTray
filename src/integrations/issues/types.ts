@@ -1,5 +1,6 @@
 export type IssueProviderType = "gitlab" | "github";
 export type IssueState = "opened" | "all";
+export type LabelFilterMode = "include" | "exclude";
 
 export interface IssueIntegrationSettings {
   enabled: boolean;
@@ -11,6 +12,7 @@ export interface IssueIntegrationSettings {
   assigneeOnly: boolean;
   syncTime: boolean;
   filterLabels: string[];
+  filterLabelsMode: LabelFilterMode;
 }
 
 export interface ExternalIssue {

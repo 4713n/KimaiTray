@@ -266,7 +266,8 @@
     "pause": "Pause",
     "paused": "Pausiert",
     "resume": "Fortsetzen",
-    "pausedSince": "pausiert seit {{time}}"
+    "pausedSince": "pausiert seit {{time}}",
+    "discard": "Verwerfen"
   },
   "recentActions": {
     "hideFromRecents": "Aus Verlauf ausblenden",
@@ -340,8 +341,11 @@
     "assigneeOnly": "Mir zugewiesen",
     "assigneeOnlyDescription": "Nur Issues anzeigen, die dem angemeldeten Benutzer zugewiesen sind",
     "filterLabels": "Nach Labels filtern",
-    "filterLabelsDescription": "Nur Issues mit ausgewählten Labels anzeigen. Testen Sie zuerst die Verbindung, um verfügbare Labels zu laden.",
+    "filterLabelsDescription_include": "Nur Issues mit ausgewählten Labels anzeigen. Testen Sie zuerst die Verbindung, um verfügbare Labels zu laden.",
+    "filterLabelsDescription_exclude": "Issues mit ausgewählten Labels ausblenden. Testen Sie zuerst die Verbindung, um verfügbare Labels zu laden.",
     "filterLabelsHint": "Testen Sie die Verbindung, um verfügbare Labels zu laden.",
+    "filterModeInclude": "Einschließen",
+    "filterModeExclude": "Ausschließen",
     "clearLabels": "Alle Labels löschen",
     "syncTime": "Zeit synchronisieren",
     "syncTimeDescription": "Aufgewendete Zeit im verknüpften GitLab-Issue protokollieren, wenn der Timer gestoppt wird",

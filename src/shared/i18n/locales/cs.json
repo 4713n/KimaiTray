@@ -266,7 +266,8 @@
     "pause": "Pauza",
     "paused": "Pozastaveno",
     "resume": "Pokračovat",
-    "pausedSince": "pozastaveno v {{time}}"
+    "pausedSince": "pozastaveno v {{time}}",
+    "discard": "Zahodit"
   },
   "recentActions": {
     "hideFromRecents": "Skrýt z nedávných",
@@ -340,8 +341,11 @@
     "assigneeOnly": "Přiřazené mně",
     "assigneeOnlyDescription": "Zobrazit pouze úkoly přiřazené přihlášenému uživateli",
     "filterLabels": "Filtrovat podle štítků",
-    "filterLabelsDescription": "Zobrazit pouze úkoly s vybranými štítky. Nejprve otestujte připojení pro načtení dostupných štítků.",
+    "filterLabelsDescription_include": "Zobrazit pouze úkoly s vybranými štítky. Nejprve otestujte připojení pro načtení dostupných štítků.",
+    "filterLabelsDescription_exclude": "Skrýt úkoly, které mají některý z vybraných štítků. Nejprve otestujte připojení pro načtení dostupných štítků.",
     "filterLabelsHint": "Nejprve otestujte připojení pro načtení dostupných štítků.",
+    "filterModeInclude": "Zahrnout",
+    "filterModeExclude": "Vyloučit",
     "clearLabels": "Zrušit všechny štítky",
     "syncTime": "Synchronizovat čas",
     "syncTimeDescription": "Zaznamenat strávený čas do propojené GitLab úlohy po zastavení časovače",

@@ -227,14 +227,16 @@ export default function TrayPopup() {
   } = useActiveTimer(client, isConfigured, refreshInterval);
 
   const {
-    pausedTimer,
-    isPaused,
+    pausedTimers,
+    hasPausedTimers,
     pauseTimer,
     resumeTimer,
-    fullStop,
+    discardPausedTimer,
+    stopActiveTimer,
     isPausing,
-    isResuming,
-    isStopping,
+    resumingId,
+    discardingId,
+    isStoppingActive,
     pauseError,
     dismissPauseError,
   } = usePauseTimer(client, timer, baseUrl);
@@ -428,17 +430,19 @@ export default function TrayPopup() {
       setTrayIcon("error");
     } else if (timer) {
       setTrayIcon("running");
-    } else if (isPaused) {
+    } else if (hasPausedTimers) {
       setTrayIcon("paused");
     } else {
       setTrayIcon("idle");
     }
-  }, [status, !!timer, isPaused]);
+  }, [status, !!timer, hasPausedTimers]);
 
   // Update tray tooltip and menu bar title
   useEffect(() => {
-    if (isPaused && pausedTimer) {
-      setTrayTooltip(`KimaiTray — ${t("pause.paused")} — ${pausedTimer.project}`);
+    if (!timer && hasPausedTimers) {
+      const first = pausedTimers[0];
+      const suffix = pausedTimers.length > 1 ? ` (+${pausedTimers.length - 1})` : "";
+      setTrayTooltip(`KimaiTray — ${t("pause.paused")} — ${first.project}${suffix}`);
       if (traySettings.menuBarLabelStyle !== "hidden") {
         setTrayTitle(t("pause.paused"));
       } else {
@@ -484,7 +488,7 @@ export default function TrayPopup() {
       setTrayTooltip("KimaiTray");
       setTrayTitle("");
     };
-  }, [timer?.id, timer?.beginSeconds, timer?.project, timer?.activity, isPaused, pausedTimer, traySettings, t]);
+  }, [timer?.id, timer?.beginSeconds, timer?.project, timer?.activity, hasPausedTimers, pausedTimers, traySettings, t]);
 
   const visibleTasks = useMemo(
     () => tasks.filter((t) => !hiddenKeys.has(t.key)),
@@ -608,9 +612,9 @@ export default function TrayPopup() {
             ) : timer ? (
               <ActiveTimerCard
                 timer={timer}
-                onStop={fullStop}
+                onStop={stopActiveTimer}
                 onPause={pauseTimer}
-                isStopping={isStopping}
+                isStopping={isStoppingActive}
                 isPausing={isPausing}
                 multipleActive={multipleActive}
                 onEdit={editTimer}
@@ -622,23 +626,25 @@ export default function TrayPopup() {
                 showTags={featureFlags.featureTags}
                 issueUrl={timerIssueUrl}
               />
-            ) : isPaused && pausedTimer ? (
+            ) : !hasPausedTimers ? (
+              <EmptyTimerState compact={compactTimer} />
+            ) : null}
+            {pausedTimers.map((pt) => (
               <PausedTimerCard
-                paused={pausedTimer}
-                onResume={resumeTimer}
-                onStop={fullStop}
-                isResuming={isResuming}
-                isStopping={isStopping}
+                key={pt.id}
+                paused={pt}
+                onResume={() => resumeTimer(pt.id)}
+                onStop={() => discardPausedTimer(pt.id)}
+                isResuming={resumingId === pt.id}
+                isStopping={discardingId === pt.id}
                 error={pauseError}
                 onDismissError={dismissPauseError}
-                compact={compactTimer}
+                compact={!!timer || compactTimer}
               />
-            ) : (
-              <EmptyTimerState compact={compactTimer} />
-            )}
+            ))}
           </div>
 
-          {(switchError || (pauseError && timer) || timesheetDeleteError) && (
+          {(switchError || pauseError || timesheetDeleteError) && (
             <div className="mx-3 mt-1.5 flex items-start gap-2 rounded-md bg-red-50 dark:bg-red-950/30 border border-red-200/60 dark:border-red-800/40 px-2.5 py-2">
               <span className="text-[11px] text-red-600 dark:text-red-400 flex-1 leading-snug">
                 {switchError || pauseError || timesheetDeleteError}
@@ -690,7 +696,7 @@ export default function TrayPopup() {
                     isLoading={status !== "unconfigured" && tasksLoading}
                     startingKey={startingKey}
                     deletingId={deletingId}
-                    disabled={isStarting || isStopping || isPausing || isResuming}
+                    disabled={isStarting || isStoppingActive || isPausing || resumingId !== null}
                     hiddenCount={hiddenCount}
                     onShowAll={clearHidden}
                     showHeader={false}
@@ -757,7 +763,7 @@ export default function TrayPopup() {
                       isLoading={status !== "unconfigured" && tasksLoading}
                       startingKey={startingKey}
                       deletingId={deletingId}
-                      disabled={isStarting || isStopping || isPausing || isResuming}
+                      disabled={isStarting || isStoppingActive || isPausing || resumingId !== null}
                       hiddenCount={hiddenCount}
                       onShowAll={clearHidden}
                       showHeader={false}
@@ -775,7 +781,7 @@ export default function TrayPopup() {
                   isLoading={status !== "unconfigured" && tasksLoading}
                   startingKey={startingKey}
                   deletingId={deletingId}
-                  disabled={isStarting || isStopping || isPausing || isResuming}
+                  disabled={isStarting || isStoppingActive || isPausing || resumingId !== null}
                   hiddenCount={hiddenCount}
                   onShowAll={clearHidden}
                 />
@@ -835,7 +841,7 @@ export default function TrayPopup() {
                   isLoading={status !== "unconfigured" && tasksLoading}
                   startingKey={startingKey}
                   deletingId={deletingId}
-                  disabled={isStarting || isStopping || isPausing || isResuming}
+                  disabled={isStarting || isStoppingActive || isPausing || resumingId !== null}
                   hiddenCount={hiddenCount}
                   onShowAll={clearHidden}
                 />

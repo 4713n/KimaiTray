@@ -88,7 +88,11 @@ export function createGitLabProvider(
         params.search = query;
       }
       if (config.filterLabels?.length) {
-        params.labels = config.filterLabels.join(",");
+        if (config.filterLabelsMode === "exclude") {
+          params["not[labels]"] = config.filterLabels.join(",");
+        } else {
+          params.labels = config.filterLabels.join(",");
+        }
       }
 
       const issues = await request<GitLabIssue[]>(

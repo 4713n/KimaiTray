@@ -266,7 +266,8 @@
     "pause": "Pause",
     "paused": "Paused",
     "resume": "Resume",
-    "pausedSince": "paused at {{time}}"
+    "pausedSince": "paused at {{time}}",
+    "discard": "Discard"
   },
   "recentActions": {
     "hideFromRecents": "Hide from recents",
@@ -340,8 +341,11 @@
     "assigneeOnly": "Assigned to me",
     "assigneeOnlyDescription": "Show only issues assigned to the authenticated user",
     "filterLabels": "Filter by labels",
-    "filterLabelsDescription": "Show only issues with selected labels. Test the connection first to load available labels.",
+    "filterLabelsDescription_include": "Show only issues with selected labels. Test the connection first to load available labels.",
+    "filterLabelsDescription_exclude": "Hide issues that have any of the selected labels. Test the connection first to load available labels.",
     "filterLabelsHint": "Test the connection to load available labels.",
+    "filterModeInclude": "Include",
+    "filterModeExclude": "Exclude",
     "clearLabels": "Clear all labels",
     "syncTime": "Sync spent time",
     "syncTimeDescription": "Log spent time to the linked GitLab issue when the timer stops",

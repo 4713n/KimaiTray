@@ -26,6 +26,7 @@ const emptyConfig: IssueIntegrationSettings = {
   assigneeOnly: false,
   syncTime: false,
   filterLabels: [],
+  filterLabelsMode: "include",
 };
 
 interface Props {
@@ -307,13 +308,40 @@ export default function IntegrationsSection({ settings, update }: Props) {
 
           <FieldGroup
             label={t("integrations.filterLabels")}
-            description={t("integrations.filterLabelsDescription")}
+            description={t(`integrations.filterLabelsDescription_${config.filterLabelsMode ?? "include"}`)}
           >
             {availableLabels.length > 0 ? (
               <>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <button
+                    type="button"
+                    onClick={() => updateField("filterLabelsMode", "include")}
+                    disabled={disabled}
+                    className={`rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors border focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed ${
+                      (config.filterLabelsMode ?? "include") === "include"
+                        ? "border-emerald-400 bg-emerald-50 text-emerald-700 dark:border-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300"
+                        : "border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    {t("integrations.filterModeInclude")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateField("filterLabelsMode", "exclude")}
+                    disabled={disabled}
+                    className={`rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors border focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed ${
+                      (config.filterLabelsMode ?? "include") === "exclude"
+                        ? "border-red-400 bg-red-50 text-red-700 dark:border-red-600 dark:bg-red-900/30 dark:text-red-300"
+                        : "border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    {t("integrations.filterModeExclude")}
+                  </button>
+                </div>
                 <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto rounded-md border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2">
                   {availableLabels.map((label) => {
                     const selected = (config.filterLabels ?? []).includes(label.name);
+                    const isExclude = (config.filterLabelsMode ?? "include") === "exclude";
                     return (
                       <button
                         key={label.name}
@@ -330,10 +358,12 @@ export default function IntegrationsSection({ settings, update }: Props) {
                           border focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-400
                           disabled:opacity-50 disabled:cursor-not-allowed
                           ${selected
-                            ? "border-transparent text-white shadow-sm"
+                            ? isExclude
+                              ? "border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 line-through"
+                              : "border-transparent text-white shadow-sm"
                             : "border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                           }`}
-                        style={selected ? { backgroundColor: label.color } : undefined}
+                        style={selected && !isExclude ? { backgroundColor: label.color } : undefined}
                       >
                         <span
                           className="inline-block h-2 w-2 rounded-full shrink-0"

@@ -110,6 +110,7 @@ export function useKimaiClient(): UseKimaiClientResult {
       assigneeOnly: false,
       syncTime: false,
       filterLabels: [],
+      filterLabelsMode: "include",
     });
   const [issueToken, setIssueToken] = useState<string | null>(null);
 

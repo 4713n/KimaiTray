@@ -92,8 +92,9 @@ export function createGitHubProvider(
     async searchIssues(query: string) {
       const assignee = config.assigneeOnly ? await getUsername() : "";
 
+      const isExclude = config.filterLabelsMode === "exclude";
       const labelFilter = config.filterLabels?.length
-        ? config.filterLabels.map((l) => `+label:"${l}"`).join("")
+        ? config.filterLabels.map((l) => isExclude ? `+-label:"${l}"` : `+label:"${l}"`).join("")
         : "";
 
       if (query.length >= 2) {
@@ -115,7 +116,7 @@ export function createGitHubProvider(
       if (assignee) {
         params.assignee = assignee;
       }
-      if (config.filterLabels?.length) {
+      if (config.filterLabels?.length && !isExclude) {
         params.labels = config.filterLabels.join(",");
       }
 
@@ -123,7 +124,12 @@ export function createGitHubProvider(
         `/repos/${config.projectPathOrRepo}/issues`,
         params,
       );
-      return issues.filter((i) => !i.pull_request).map(normalize);
+      const filtered = issues.filter((i) => !i.pull_request);
+      if (isExclude && config.filterLabels?.length) {
+        const excluded = new Set(config.filterLabels);
+        return filtered.filter((i) => !i.labels.some((l) => excluded.has(l.name))).map(normalize);
+      }
+      return filtered.map(normalize);
     },
 
     getIssueUrl(issue: ExternalIssue) {
