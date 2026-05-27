@@ -11,6 +11,7 @@ export interface IssueIntegrationSettings {
   defaultState: IssueState;
   assigneeOnly: boolean;
   syncTime: boolean;
+  autoInsertUrl: boolean;
   filterLabels: string[];
   filterLabelsMode: LabelFilterMode;
 }

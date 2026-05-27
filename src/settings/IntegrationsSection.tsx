@@ -25,6 +25,7 @@ const emptyConfig: IssueIntegrationSettings = {
   defaultState: "opened",
   assigneeOnly: false,
   syncTime: false,
+  autoInsertUrl: false,
   filterLabels: [],
   filterLabelsMode: "include",
 };
@@ -405,6 +406,18 @@ export default function IntegrationsSection({ settings, update }: Props) {
               />
             </FieldGroup>
           )}
+
+          <FieldGroup
+            label={t("integrations.autoInsertUrl")}
+            description={t("integrations.autoInsertUrlDescription")}
+            horizontal
+          >
+            <Toggle
+              checked={config.autoInsertUrl ?? false}
+              onChange={(v) => updateField("autoInsertUrl", v)}
+              disabled={disabled}
+            />
+          </FieldGroup>
 
           <Divider />
 

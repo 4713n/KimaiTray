@@ -111,6 +111,7 @@ export function useKimaiClient(): UseKimaiClientResult {
       defaultState: "opened",
       assigneeOnly: false,
       syncTime: false,
+      autoInsertUrl: false,
       filterLabels: [],
       filterLabelsMode: "include",
     });

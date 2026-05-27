@@ -363,6 +363,8 @@
     "clearLabels": "Zrušit všechny štítky",
     "syncTime": "Synchronizovat čas",
     "syncTimeDescription": "Zaznamenat strávený čas do propojené GitLab úlohy po zastavení časovače",
+    "autoInsertUrl": "Automaticky vložit URL úlohy",
+    "autoInsertUrlDescription": "Automaticky přidat URL úlohy do popisu časovače při výběru úlohy",
     "perConnectionHint": "Tato nastavení platí pouze pro aktuálně zvolené připojení"
   }
 }

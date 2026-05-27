@@ -54,6 +54,16 @@ export default function NewTaskForm({
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [selectedIssue, setSelectedIssue] = useState<ExternalIssue | null>(null);
+  const autoInsertUrl = issueIntegrationConfig?.autoInsertUrl ?? false;
+  const handleSelectIssue = (issue: ExternalIssue | null) => {
+    setSelectedIssue(issue);
+    if (issue && autoInsertUrl) {
+      setDescription((prev) => {
+        const trimmed = prev.trim();
+        return trimmed ? `${trimmed}\n${issue.webUrl}` : issue.webUrl;
+      });
+    }
+  };
   const [useCustomTime, setUseCustomTime] = useState(false);
   const [beginTime, setBeginTime] = useState("");
 
@@ -199,7 +209,7 @@ export default function NewTaskForm({
               config={issueIntegrationConfig}
               token={issueToken}
               selectedIssue={selectedIssue}
-              onSelectIssue={setSelectedIssue}
+              onSelectIssue={handleSelectIssue}
               disabled={isSubmitting}
             />
             {selectedIssue && (
