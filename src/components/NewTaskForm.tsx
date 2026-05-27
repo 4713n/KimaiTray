@@ -146,7 +146,7 @@ export default function NewTaskForm({
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 pt-2.5 space-y-2.5">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-3 pt-2.5 space-y-2.5">
         {showCustomerSelect && (
           <div>
             <label className="block text-[10px] font-medium text-gray-500 dark:text-gray-400 mb-1">

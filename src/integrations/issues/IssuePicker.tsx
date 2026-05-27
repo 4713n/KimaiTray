@@ -93,14 +93,14 @@ export default function IssuePicker({
 
   return (
     <div ref={containerRef} className="relative">
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 min-w-0">
         <button
           type="button"
           onClick={() => {
             if (!disabled) setOpen(!open);
           }}
           disabled={disabled}
-          className="w-full rounded-lg border border-gray-300 dark:border-white/20 bg-white dark:bg-white/[0.08] px-3 py-2 text-[13px] text-left focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] focus:outline-none disabled:opacity-40 transition-colors flex items-center justify-between gap-1"
+          className="min-w-0 flex-1 rounded-lg border border-gray-300 dark:border-white/20 bg-white dark:bg-white/[0.08] px-3 py-2 text-[13px] text-left focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] focus:outline-none disabled:opacity-40 transition-colors flex items-center justify-between gap-1"
         >
           <span
             className={

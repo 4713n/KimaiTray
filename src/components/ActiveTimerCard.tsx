@@ -178,9 +178,12 @@ export default function ActiveTimerCard({
     setBeginError("");
   }, [timer.id]);
 
+  const exiting = isStopping || isPausing;
+  const cardAnim = exiting ? "animate-card-out" : "animate-card-in";
+
   if (compact) {
     return (
-      <div className="mx-3 mt-1.5 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40">
+      <div key={timer.id} className={`mx-3 mt-1.5 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40 ${cardAnim}`}>
         <div className="px-2.5 py-1.5 flex items-center gap-2">
           <ColorDots
             activityColor={timer.activityColor}
@@ -230,7 +233,7 @@ export default function ActiveTimerCard({
   }
 
   return (
-    <div className="mx-3 mt-2 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40">
+    <div key={timer.id} className={`mx-3 mt-2 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40 ${cardAnim}`}>
       <div className="px-3 py-2.5">
         {/* Row 1: Project + Activity + badges */}
         <div className="flex items-center gap-2 mb-1">
