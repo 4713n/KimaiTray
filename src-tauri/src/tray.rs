@@ -1,4 +1,6 @@
-use std::sync::atomic::{AtomicBool, AtomicU64, AtomicU8, Ordering};
+use std::sync::atomic::{AtomicU64, AtomicU8, Ordering};
+#[cfg(target_os = "macos")]
+use std::sync::atomic::AtomicBool;
 use std::sync::Mutex;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tauri::{
@@ -248,6 +250,7 @@ fn position_popup(window: &WebviewWindow, tray_rect: &tauri::Rect) -> tauri::Res
     Ok(())
 }
 
+#[cfg(target_os = "macos")]
 static VIBRANCY_APPLIED: AtomicBool = AtomicBool::new(false);
 
 #[tauri::command]
