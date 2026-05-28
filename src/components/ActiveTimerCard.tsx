@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { ActiveTimer, ColorMode } from "../types";
 import TagsList from "./TagsList";
 import TagsInput from "./TagsInput";
@@ -77,8 +78,14 @@ export default function ActiveTimerCard({
         Math.max(0, Math.floor(Date.now() / 1000) - timer.beginSeconds),
       );
     tick();
+    // setInterval handles the normal case; kimai://tick from the native Rust
+    // thread is a fallback for Linux where WebKitGTK throttles JS timers.
     const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
+    const unlistenPromise = getCurrentWindow().listen("kimai://tick", tick);
+    return () => {
+      clearInterval(id);
+      unlistenPromise.then((fn: () => void) => fn());
+    };
   }, [timer.beginSeconds]);
 
   // ── Description editing ──

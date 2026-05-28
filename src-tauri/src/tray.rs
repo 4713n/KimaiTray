@@ -572,11 +572,16 @@ pub fn create_tray(app: &AppHandle) -> tauri::Result<()> {
     }
 
     // Background thread: updates tray title every second while a timer is running.
-    // Runs natively so macOS cannot throttle it like webview JS timers.
+    // Runs natively so macOS/Linux cannot throttle it like webview JS timers.
+    // Also emits kimai://tick to the popup so the JS elapsed counter stays alive
+    // on Linux where WebKitGTK throttles setInterval for unfocused windows.
     let ticker_app = app.clone();
     std::thread::spawn(move || loop {
         std::thread::sleep(Duration::from_secs(1));
         tick_tray(&ticker_app);
+        if let Some(popup) = ticker_app.get_webview_window("tray-popup") {
+            let _ = popup.emit("kimai://tick", ());
+        }
     });
 
     Ok(())
