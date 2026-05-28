@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.7.2] - 2026-05-28
+
+### New Features
+
+- **Paused timer description hover** — new setting to show the timer description as a tooltip when hovering over a paused timer
+
+### Bug Fixes
+
+- **Fixed elapsed timer freezing on Linux** — prevented elapsed timer from freezing in detached mode on Linux
+
 ## [0.7.1] - 2026-05-27
 
 ### Bug Fixes
